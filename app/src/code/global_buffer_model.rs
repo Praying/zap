@@ -153,6 +153,9 @@ pub enum GlobalBufferModelEvent {
     /// A server-local buffer was updated from a file-watcher event.
     /// Carries the incremental diff edits for the ServerModel to push
     /// to connected clients as `BufferUpdatedPush`.
+    ///
+    /// Note: this event is NOT emitted from `apply_client_edit`. See that
+    /// method's doc comment for the V0 single-client limitation.
     ServerLocalBufferUpdated {
         file_id: FileId,
         /// Incremental edits with 1-indexed character offsets (matching `CharOffset`).
@@ -229,11 +232,17 @@ impl GlobalBufferModel {
                 edits,
             } = event
             {
+                // wire offset 是 1-indexed char offset(对齐 CharOffset)。
+                // 用饱和转换避免 32-bit 平台 `as usize` 截断高位;native 64-bit 上等价。
                 let char_edits: Vec<_> = edits
                     .iter()
                     .map(|e| CharOffsetEdit {
-                        start: CharOffset::from(e.start_offset as usize),
-                        end: CharOffset::from(e.end_offset as usize),
+                        start: CharOffset::from(
+                            usize::try_from(e.start_offset).unwrap_or(usize::MAX),
+                        ),
+                        end: CharOffset::from(
+                            usize::try_from(e.end_offset).unwrap_or(usize::MAX),
+                        ),
                         text: e.text.clone(),
                     })
                     .collect();
@@ -1194,10 +1203,10 @@ impl GlobalBufferModel {
             return;
         };
 
-        let expected_cv = ContentVersion::from_raw(expected_client_version as usize);
+        let expected_cv = ContentVersion::from_wire_u64(expected_client_version);
         if sync_clock.server_push_matches(expected_cv) {
             // Accept the update — apply edits incrementally.
-            sync_clock.server_version = ContentVersion::from_raw(new_server_version as usize);
+            sync_clock.server_version = ContentVersion::from_wire_u64(new_server_version);
 
             let Some(buffer) = state.buffer.upgrade(ctx) else {
                 return;
@@ -1248,7 +1257,21 @@ impl GlobalBufferModel {
     /// If `expected_server_version` matches the buffer's current server version,
     /// the edits are applied to the in-memory buffer (no disk write) and the
     /// client version is updated. Returns `true` if accepted, `false` if rejected
-    /// (stale edit — silently discarded).
+    /// (stale edit — silently discarded, per `BufferEdit` proto spec).
+    ///
+    /// V0 limitation (single-client per buffer):
+    /// this intentionally does NOT emit `ServerLocalBufferUpdated`. That event
+    /// would broadcast the edit to every other connection that has the buffer
+    /// open, but `SyncClock.client_version` is daemon-wide rather than
+    /// per-connection, so there is no safe `expected_client_version` to put
+    /// in a `BufferUpdatedPush` targeted at peer connection C (its local
+    /// `client_version` is independent of A's). Until `SyncClock` becomes
+    /// per-connection, only one client should hold a writable view of a
+    /// given remote buffer at a time.
+    ///
+    /// TODO(ssh-remote, multi-client): make `SyncClock.client_version` a
+    /// `HashMap<ConnectionId, ContentVersion>` and forward A's edits to
+    /// peers with the per-peer expected `client_version`.
     #[cfg(feature = "local_fs")]
     pub fn apply_client_edit(
         &mut self,
@@ -1285,13 +1308,20 @@ impl GlobalBufferModel {
         let new_version = ContentVersion::new();
         buffer.update(ctx, |buffer, ctx| {
             let max_offset = buffer.max_charoffset();
+            // wire offset 饱和转换 + clamp 到 buffer 末尾,双重防御。
             let char_edits: Vec<(std::ops::Range<CharOffset>, String)> = edits
                 .iter()
                 .map(|edit| {
-                    let start =
-                        CharOffset::from((edit.start_offset as usize).min(max_offset.as_usize()));
-                    let end =
-                        CharOffset::from((edit.end_offset as usize).min(max_offset.as_usize()));
+                    let start = CharOffset::from(
+                        usize::try_from(edit.start_offset)
+                            .unwrap_or(usize::MAX)
+                            .min(max_offset.as_usize()),
+                    );
+                    let end = CharOffset::from(
+                        usize::try_from(edit.end_offset)
+                            .unwrap_or(usize::MAX)
+                            .min(max_offset.as_usize()),
+                    );
                     (start..end, edit.text.clone())
                 })
                 .collect();

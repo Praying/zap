@@ -107,10 +107,11 @@ impl SyncClock {
     }
 
     /// Reconstruct a `SyncClock` from wire values (proto deserialization).
+    /// 用 `from_wire_u64` 饱和而不是 `as usize`,避免 32-bit 平台上隐式截断。
     pub fn from_wire(server_version: u64, client_version: u64) -> Self {
         Self {
-            server_version: ContentVersion::from_raw(server_version as usize),
-            client_version: ContentVersion::from_raw(client_version as usize),
+            server_version: ContentVersion::from_wire_u64(server_version),
+            client_version: ContentVersion::from_wire_u64(client_version),
         }
     }
 

@@ -507,8 +507,14 @@ impl super::TerminalView {
             return LinkValidationContext::Remote(None);
         };
 
-        // 拉取新 cwd:清掉旧条目保持有界,插入 `None` 占位(标记拉取中)。
-        self.remote_dir_listing_cache.clear();
+        // 拉取新 cwd:超出容量上限时按插入顺序 FIFO 淘汰最旧条目,
+        // 然后插入 `None` 占位(标记拉取中)。`MAX_ENTRIES` 选 8 足够覆盖
+        // 用户在终端里常切的几个工作目录,避免每次切回都要 RPC。
+        const MAX_ENTRIES: usize = 8;
+        while self.remote_dir_listing_cache.len() >= MAX_ENTRIES {
+            // shift_remove_index 保持插入顺序;FIFO 头部是最旧的。
+            self.remote_dir_listing_cache.shift_remove_index(0);
+        }
         self.remote_dir_listing_cache
             .insert(cache_key.clone(), None);
 
@@ -545,15 +551,15 @@ impl super::TerminalView {
                                 err.message
                             );
                             // 拉取失败:移除占位,下次悬停时会重试。
-                            me.remote_dir_listing_cache.remove(&key_for_store);
+                            me.remote_dir_listing_cache.shift_remove(&key_for_store);
                         }
                         None => {
-                            me.remote_dir_listing_cache.remove(&key_for_store);
+                            me.remote_dir_listing_cache.shift_remove(&key_for_store);
                         }
                     },
                     Err(err) => {
                         log::warn!("远端 ListDirectory RPC 出错 {cwd_for_store:?}: {err}");
-                        me.remote_dir_listing_cache.remove(&key_for_store);
+                        me.remote_dir_listing_cache.shift_remove(&key_for_store);
                     }
                 }
             },

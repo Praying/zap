@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
+use bimap::BiMap;
 use warp_editor::content::buffer::Buffer;
 use warp_util::file::FileId;
 use warpui::{ModelContext, ModelHandle, SingletonEntity as _};
@@ -23,8 +24,10 @@ pub enum PendingBufferRequestKind {
 /// - Per-buffer connection sets (which connections have each buffer open)
 /// - Pending async requests (OpenBuffer, SaveBuffer, ResolveConflict) awaiting events
 pub struct ServerBufferTracker {
-    /// Maps wire path strings to `FileId` for open server-local buffers.
-    open_buffers: HashMap<String, FileId>,
+    /// 双向映射 wire path ↔ FileId,两侧查找都 O(1)。
+    /// `path_for_file_id` 在每次 `ServerLocalBufferUpdated` 都会被调用,
+    /// 用 BiMap 避免线性扫描。
+    open_buffers: BiMap<String, FileId>,
     /// 持有每个已打开 server-local buffer 的**强引用** `ModelHandle<Buffer>`。
     ///
     /// `GlobalBufferModel` 内部只存 `WeakModelHandle`,客户端靠编辑器 view 持有
@@ -47,7 +50,7 @@ pub struct ServerBufferTracker {
 impl ServerBufferTracker {
     pub fn new() -> Self {
         Self {
-            open_buffers: HashMap::new(),
+            open_buffers: BiMap::new(),
             buffer_handles: HashMap::new(),
             buffer_connections: HashMap::new(),
             pending_requests: HashMap::new(),
@@ -68,20 +71,17 @@ impl ServerBufferTracker {
         self.buffer_handles.insert(file_id, buffer);
     }
 
-    /// Look up a FileId by its wire path.
+    /// Look up a FileId by its wire path. O(1)。
     pub fn file_id_for_path(&self, path: &str) -> Option<FileId> {
-        self.open_buffers.get(path).copied()
+        self.open_buffers.get_by_left(path).copied()
     }
 
-    /// Look up the wire path for a given FileId.
+    /// Look up the wire path for a given FileId. O(1) via BiMap。
+    /// 返回 owned `String` 而非 `&str`,让调用方在持有结果的同时还能借用
+    /// 其它 `&mut self`(典型场景:在事件 handler 里拿到 path 然后回头
+    /// `send_server_message(...)`)。push 频率不高,clone 开销可忽略。
     pub fn path_for_file_id(&self, file_id: FileId) -> Option<String> {
-        self.open_buffers.iter().find_map(|(p, id)| {
-            if *id == file_id {
-                Some(p.clone())
-            } else {
-                None
-            }
-        })
+        self.open_buffers.get_by_right(&file_id).cloned()
     }
 
     // ── Connection tracking ───────────────────────────────────────
@@ -129,7 +129,7 @@ impl ServerBufferTracker {
 
         for &file_id in &orphaned {
             self.buffer_connections.remove(&file_id);
-            self.open_buffers.retain(|_, id| *id != file_id);
+            self.open_buffers.remove_by_right(&file_id);
             self.pending_requests.remove(&file_id);
             // 释放强引用,允许 buffer 被回收。
             self.buffer_handles.remove(&file_id);
@@ -147,7 +147,7 @@ impl ServerBufferTracker {
         conn_id: ConnectionId,
         ctx: &mut ModelContext<ServerModel>,
     ) {
-        let Some(&file_id) = self.open_buffers.get(path) else {
+        let Some(&file_id) = self.open_buffers.get_by_left(path) else {
             return;
         };
 
@@ -160,7 +160,7 @@ impl ServerBufferTracker {
 
         // No connections remain — deallocate.
         self.buffer_connections.remove(&file_id);
-        self.open_buffers.remove(path);
+        self.open_buffers.remove_by_left(path);
         self.pending_requests.remove(&file_id);
         // 释放强引用,允许 buffer 被回收。
         self.buffer_handles.remove(&file_id);

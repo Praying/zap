@@ -340,8 +340,18 @@ message OpenBufferResponse {
 // If the server accepts (expected_server_version matches its local version),
 // it applies the edit silently — no response needed since the client already
 // has the edit applied locally.
-// If the server rejects (version mismatch), it pushes a BufferUpdatedPush
-// with its current state.
+// If the server rejects (version mismatch), the edit is silently dropped;
+// the client discovers the divergence on the next file-watcher
+// BufferUpdatedPush that carries the server's current state. (The earlier
+// "server pushes BufferUpdatedPush on reject" wording did not match the
+// implementation and has been removed.)
+//
+// V0 limitation (single-client per buffer): when buffer B is open on
+// connections A and C, an accepted BufferEdit from A is NOT forwarded to
+// C. SyncClock.client_version is daemon-wide rather than per-connection,
+// so there is no safe expected_client_version to put in a push targeted
+// at C. Multi-client push is tracked as follow-up work; until then, only
+// one client should hold a writable view of a remote buffer at a time.
 message BufferEdit {
   string path = 1;
   uint64 expected_server_version = 2;

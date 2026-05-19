@@ -374,14 +374,21 @@ async fn cross_compile_remote_server(backend: &DevBuildBackend) -> Result<PathBu
         ));
     }
 
-    // 产物位置:`target/<triple>/<profile>/<bin_name>`。
-    let binary = root
-        .join("target")
+    // 产物位置:`<target_dir>/<triple>/<profile>/<bin_name>`。
+    // 优先读 `CARGO_TARGET_DIR`,否则回退到 `<workspace>/target`。仓库未在
+    // `.cargo/config.toml` 里设 `[build] target-dir`,故只需考虑 env。
+    let target_root = std::env::var_os("CARGO_TARGET_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| root.join("target"));
+    let binary = target_root
         .join(remote_server::setup::DEV_MUSL_TARGET)
         .join(remote_server::setup::DEV_REMOTE_PROFILE)
         .join(bin_name);
     if !binary.is_file() {
-        return Err(anyhow!("交叉编译完成但未在 {} 找到产物", binary.display()));
+        return Err(anyhow!(
+            "交叉编译完成但未在 {} 找到产物(若设置了 CARGO_TARGET_DIR 请确认路径)",
+            binary.display()
+        ));
     }
     Ok(binary)
 }

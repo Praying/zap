@@ -1359,8 +1359,8 @@ impl ServerModel {
             return;
         };
 
-        let expected_sv = ContentVersion::from_raw(msg.expected_server_version as usize);
-        let new_cv = ContentVersion::from_raw(msg.new_client_version as usize);
+        let expected_sv = ContentVersion::from_wire_u64(msg.expected_server_version);
+        let new_cv = ContentVersion::from_wire_u64(msg.new_client_version);
 
         // Per spec: if the edit is rejected (stale server version),
         // the server silently drops it.
@@ -1448,8 +1448,8 @@ impl ServerModel {
             ));
         };
 
-        let ack_sv = ContentVersion::from_raw(msg.acknowledged_server_version as usize);
-        let current_cv = ContentVersion::from_raw(msg.current_client_version as usize);
+        let ack_sv = ContentVersion::from_wire_u64(msg.acknowledged_server_version);
+        let current_cv = ContentVersion::from_wire_u64(msg.current_client_version);
         let result = GlobalBufferModel::handle(ctx).update(ctx, |gbm, ctx| {
             gbm.resolve_conflict(file_id, ack_sv, current_cv, &msg.client_content, ctx)
         });

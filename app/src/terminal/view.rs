@@ -2393,15 +2393,17 @@ pub struct TerminalView {
 
     /// OpenWarp:远端 SSH 会话的 cwd 目录列表缓存,用于精确校验终端文件链接。
     ///
-    /// 键是远端 cwd 绝对路径,值为该目录的真实子项列表;`None` 表示该 cwd
-    /// 的列表正在异步拉取中(daemon `ListDirectory` RPC)。仅保留少量条目
-    /// (拉取新 cwd 时清掉旧的),保持有界。本地会话永不写入此缓存。
+    /// 键是 `(session_id, cwd 绝对路径)`,值为该目录的真实子项列表;`None`
+    /// 表示该 cwd 的列表正在异步拉取中(daemon `ListDirectory` RPC)。
+    /// 用 `IndexMap` 保持插入顺序,容量上限定义在
+    /// `link_detection::remote_dir_listing_context` 中的 `MAX_ENTRIES`,
+    /// 拉取新 cwd 触发 FIFO 淘汰。本地会话永不写入此缓存。
     #[cfg(all(
         feature = "local_tty",
         feature = "local_fs",
         not(target_family = "wasm")
     ))]
-    remote_dir_listing_cache: HashMap<
+    remote_dir_listing_cache: indexmap::IndexMap<
         (warp_core::SessionId, PathBuf),
         Option<std::sync::Arc<crate::util::file::RemoteDirListing>>,
     >,
@@ -3814,7 +3816,7 @@ impl TerminalView {
                 feature = "local_fs",
                 not(target_family = "wasm")
             ))]
-            remote_dir_listing_cache: HashMap::new(),
+            remote_dir_listing_cache: indexmap::IndexMap::new(),
             last_focus_ts: None,
             tips_completed: resources.tips_completed.clone(),
             was_ever_visible: false,

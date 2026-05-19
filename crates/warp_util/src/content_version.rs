@@ -28,6 +28,14 @@ impl ContentVersion {
         ContentVersion(val)
     }
 
+    /// 协议反序列化辅助:从 wire 上的 `u64` 构造 `ContentVersion`,
+    /// 在 32-bit 平台上做饱和(`usize::MAX`)而不是隐式截断。
+    /// 当前仓库的 native build 都是 64-bit,这里只是把行为显式化,避免
+    /// `as usize` 在小概率 32-bit 编译里悄悄丢高位。
+    pub fn from_wire_u64(val: u64) -> Self {
+        ContentVersion(usize::try_from(val).unwrap_or(usize::MAX))
+    }
+
     /// Returns the underlying value as a `u64` for wire serialization.
     pub fn as_u64(&self) -> u64 {
         self.0 as u64

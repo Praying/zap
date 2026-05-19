@@ -406,11 +406,23 @@ pub const DEV_REMOTE_FEATURES: &str = "release_bundle,crash_reporting,standalone
 
 /// 判断当前是否处于「开发模式 remote-server 安装」路径。
 ///
-/// 条件:DEBUG 构建(`debug_assertions`)且没有注入 `GIT_RELEASE_TAG`
+/// 默认条件:DEBUG 构建(`debug_assertions`)且没有注入 `GIT_RELEASE_TAG`
 /// (`app_version().is_none()`,即源码本地构建,非发行版)。这与
 /// `remote_server_binary()` / `download_url()` 中对「无 release tag」的
 /// 判定保持同一标准。release 构建恒为 `false`,行为完全不变。
+///
+/// 显式覆盖:设置 `WARP_REMOTE_SERVER_FROM_LOCAL=1` 强制走本地交叉编译路径
+/// (`0`/未设视为关闭)。用于 release 构建里临时联调本地 remote-server。
 pub fn is_dev_source_build() -> bool {
+    if let Some(raw) = std::env::var_os("WARP_REMOTE_SERVER_FROM_LOCAL") {
+        let lossy = raw.to_string_lossy();
+        let trimmed = lossy.trim();
+        let disabled =
+            trimmed.is_empty() || trimmed == "0" || trimmed.eq_ignore_ascii_case("false");
+        if !disabled {
+            return true;
+        }
+    }
     cfg!(debug_assertions) && ChannelState::app_version().is_none()
 }
 
