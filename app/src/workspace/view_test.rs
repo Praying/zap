@@ -302,7 +302,7 @@ fn test_worktree_sidecar_search_editor_enter_executes_selection() {
 /// RAII guard that removes tab config TOML files whose name starts with
 /// `prefix` from `~/.warp/tab_configs/` on drop. Because `Drop` runs even
 /// when a test panics, this prevents stale worktree configs from leaking
-/// into Warp dev.
+/// into Zap dev.
 #[cfg(feature = "local_fs")]
 struct TabConfigCleanupGuard {
     prefix: &'static str,
@@ -1304,7 +1304,7 @@ fn test_open_or_toggle_warp_drive() {
 
         let workspace = mock_workspace(&mut app);
         workspace.update(&mut app, |workspace, ctx| {
-            // First, unconditionally open Zap drive as a system action. WD should be open and welcome tips should not have opening zap drive.
+            // First, unconditionally open Zap Drive as a system action. WD should be open and welcome tips should not have opening zap drive.
             workspace.open_or_toggle_warp_drive(
                 false, /* toggle */
                 false, /* explicit_user_action */
@@ -1312,7 +1312,7 @@ fn test_open_or_toggle_warp_drive() {
             );
             assert!(
                 workspace.current_workspace_state.is_warp_drive_open,
-                "Warp Drive should be open"
+                "Zap Drive should be open"
             );
             assert!(
                 !workspace
@@ -1320,10 +1320,10 @@ fn test_open_or_toggle_warp_drive() {
                     .as_ref(ctx)
                     .features_used
                     .contains(&Tip::Action(TipAction::ZapDrive)),
-                "Warp drive welcome tip should not be completed"
+                "Zap drive welcome tip should not be completed"
             );
 
-            // Next, toggle warp drive as a user action. WD should be closed and tip should not be filled out.
+            // Next, toggle zap drive as a user action. WD should be closed and tip should not be filled out.
             workspace.open_or_toggle_warp_drive(
                 true, /* toggle */
                 true, /* explicit_user_action */
@@ -1331,7 +1331,7 @@ fn test_open_or_toggle_warp_drive() {
             );
             assert!(
                 !workspace.current_workspace_state.is_warp_drive_open,
-                "Warp Drive should be closed"
+                "Zap Drive should be closed"
             );
             assert!(
                 !workspace
@@ -1339,10 +1339,10 @@ fn test_open_or_toggle_warp_drive() {
                     .as_ref(ctx)
                     .features_used
                     .contains(&Tip::Action(TipAction::ZapDrive)),
-                "Warp drive welcome tip should not be completed"
+                "Zap drive welcome tip should not be completed"
             );
 
-            // Finally, toggle warp drive again as a user action. WD should be open and tip filled out.
+            // Finally, toggle zap drive again as a user action. WD should be open and tip filled out.
             workspace.open_or_toggle_warp_drive(
                 true, /* toggle */
                 true, /* explicit_user_action */
@@ -1350,7 +1350,7 @@ fn test_open_or_toggle_warp_drive() {
             );
             assert!(
                 workspace.current_workspace_state.is_warp_drive_open,
-                "Warp Drive should be open"
+                "Zap Drive should be open"
             );
             assert!(
                 workspace
@@ -1358,7 +1358,7 @@ fn test_open_or_toggle_warp_drive() {
                     .as_ref(ctx)
                     .features_used
                     .contains(&Tip::Action(TipAction::ZapDrive)),
-                "Warp drive welcome tip should not be completed"
+                "Zap drive welcome tip should not be completed"
             );
         });
     });
@@ -1447,7 +1447,7 @@ fn test_switch_focus_panels() {
         workspace.update(&mut app, |view, ctx| {
             assert!(
                 view.left_panel_view.is_self_or_child_focused(ctx),
-                "Expected Warp Drive panel to be focused"
+                "Expected Zap Drive panel to be focused"
             );
         });
 

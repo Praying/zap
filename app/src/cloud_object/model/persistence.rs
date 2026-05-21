@@ -728,7 +728,7 @@ impl ObjectStoreModel {
             .count()
     }
 
-    /// 已进入错误状态且会显示在 Warp Drive index 中的本地对象数量。
+    /// 已进入错误状态且会显示在 Zap Drive index 中的本地对象数量。
     pub fn num_visible_errored_objects(&self) -> usize {
         self.objects_by_id
             .values()

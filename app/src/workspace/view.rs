@@ -489,7 +489,7 @@ const MAX_FONT_SIZE: f32 = 25.0;
 const FONT_SIZE_INCREMENT: f32 = 1.0;
 
 pub const TAB_BAR_HEIGHT: f32 = 34.;
-/// Height for all panel headers (tab bar, warp drive, resource center, theme chooser, etc.).
+/// Height for all panel headers (tab bar, zap drive, resource center, theme chooser, etc.).
 /// This ensures consistent header heights across all UI panels.
 pub const PANEL_HEADER_HEIGHT: f32 = TAB_BAR_HEIGHT;
 /// The hover area height for states where the tab bar is revealed on hover.
@@ -506,8 +506,8 @@ const TAB_BAR_ICON_PADDING: f32 = 4.;
 
 const TAB_BAR_PILL_WIDTH: f32 = 100.;
 const PILL_FONT_SIZE: f32 = 12.;
-// We use the word "Warp" in the Update Ready button to make it obvious that the terminal is Warp.
-// This can lead to free advertising when users screen-share Warp when an update is available.
+// We use the word "Zap" in the Update Ready button to make it obvious that the terminal is Zap.
+// This can lead to free advertising when users screen-share Zap when an update is available.
 const TAB_BAR_OVERFLOW_MENU_WIDTH: f32 = 300.;
 
 #[cfg(not(target_family = "wasm"))]
@@ -711,7 +711,7 @@ impl ShowTabBar {
 #[cfg(target_family = "wasm")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum SimplifiedWasmTabBarContent {
-    /// Viewing a Warp Drive object (notebook, workflow, env vars, AI facts, MCP servers)
+    /// Viewing a Zap Drive object (notebook, workflow, env vars, AI facts, MCP servers)
     WarpDriveObject,
     /// Participating in a shared session (viewer or writer). Contains the optional ambient agent task ID.
     SharedSession { task_id: Option<AmbientAgentTaskId> },
@@ -2617,7 +2617,7 @@ impl Workspace {
             me.handle_window_settings_changed_event(event, ctx);
         });
 
-        // Show the Warp AI warm welcome iff the user hasn't dismissed it nor interacted with Warp AI before.
+        // Show the Zap AI warm welcome iff the user hasn't dismissed it nor interacted with Zap AI before.
         // Also, avoid showing it in integration tests to prevent interaction with other tests.
         let mut should_show_ai_assistant_warm_welcome: bool = !FeatureFlag::AgentMode.is_enabled()
             && AISettings::as_ref(ctx).is_any_ai_enabled(ctx)
@@ -2630,7 +2630,7 @@ impl Workspace {
                 .map(|dismissed: bool| !dismissed)
                 .unwrap_or(true);
 
-        // Don't automatically show the Warp AI welcome during onboarding if the block onboarding flow is being used.
+        // Don't automatically show the Zap AI welcome during onboarding if the block onboarding flow is being used.
         // This way, we can delay the reveal until the end of the onboarding flow so as not to overwhelm the user.
         if matches!(
             BlockOnboarding::get_group(ctx),
@@ -3513,7 +3513,7 @@ impl Workspace {
                 LeftPanelDisplayedTab::GlobalSearch => ToolPanelView::GlobalSearch {
                     entry_focus: GlobalSearchEntryFocus::Results,
                 },
-                LeftPanelDisplayedTab::WarpDrive => ToolPanelView::WarpDrive,
+                LeftPanelDisplayedTab::ZapDrive => ToolPanelView::ZapDrive,
                 LeftPanelDisplayedTab::ConversationListView => ToolPanelView::ConversationListView,
                 LeftPanelDisplayedTab::SshManager => ToolPanelView::SshManager,
                 LeftPanelDisplayedTab::SkillManager => ToolPanelView::SkillManager,
@@ -3582,26 +3582,26 @@ impl Workspace {
             placeholder_pane = Some(home_pane.as_pane().id());
             self.add_tab_from_existing_pane(home_pane, 0, ctx);
 
-            // If we can't start a terminal session to run the onboarding flow, show the Warp Home
-            // placeholder along with Warp Drive.
+            // If we can't start a terminal session to run the onboarding flow, show the Zap Home
+            // placeholder along with Zap Drive.
             true
         };
         let initial_tab = self.active_tab_pane_group().clone();
 
         if open_warp_drive {
-            // We open Warp Drive automatically in two cases:
-            // * The user is new to Warp, and went through the overall onboarding flow
+            // We open Zap Drive automatically in two cases:
+            // * The user is new to Zap, and went through the overall onboarding flow
             // * The user is on the web, so we can't open a terminal session.
             let initial_load_complete =
                 crate::cloud_object::model::persistence::ObjectStoreModel::as_ref(ctx)
                     .initial_load_complete();
             ctx.spawn(initial_load_complete, move |me, _, ctx| {
-                // New Warp users can have non-welcome objects if they were directly invited OR if
+                // New Zap users can have non-welcome objects if they were directly invited OR if
                 // linked objects were copied over from an anonymous user.
                 if ObjectStoreModel::as_ref(ctx).has_non_welcome_objects() {
                     me.open_or_toggle_warp_drive(false, false, ctx);
 
-                    // After opening Warp Drive, if we rendered the Warp Home placeholder panel, replace it with one of
+                    // After opening Zap Drive, if we rendered the Zap Home placeholder panel, replace it with one of
                     // the user's own objects.
                     if show_warp_home {
                         let object_store_model = ObjectStoreModel::as_ref(ctx);
@@ -3761,7 +3761,7 @@ impl Workspace {
             }
         }
 
-        // Check if focused pane is a Warp Drive object
+        // Check if focused pane is a Zap Drive object
         let focused_pane_id = pane_group.focused_pane_id(ctx);
         if focused_pane_id.is_warp_drive_object_pane() {
             return Some(SimplifiedWasmTabBarContent::WarpDriveObject);
@@ -3871,9 +3871,9 @@ impl Workspace {
         });
 
         // The panel is already open and no models are open, so just refocus the panel.
-        // If there is a modal open, it would sit above the Warp AI panel and we would end up
-        // focusing the Warp AI panel _behind_ the floating modal. Instead, we opt for the normal
-        // toggle behavior which will close the current modal view and then toggle Warp AI.
+        // If there is a modal open, it would sit above the Zap AI panel and we would end up
+        // focusing the Zap AI panel _behind_ the floating modal. Instead, we opt for the normal
+        // toggle behavior which will close the current modal view and then toggle Zap AI.
         if self.current_workspace_state.is_ai_assistant_panel_open
             && !self.ai_assistant_panel.is_self_or_child_focused(ctx)
             && !self.current_workspace_state.is_any_modal_open(ctx)
@@ -3886,7 +3886,7 @@ impl Workspace {
         self.current_workspace_state.is_ai_assistant_panel_open =
             !self.current_workspace_state.is_ai_assistant_panel_open;
 
-        // Close any other modals that could be floating on top of the Warp AI panel.
+        // Close any other modals that could be floating on top of the Zap AI panel.
         self.current_workspace_state.close_all_modals();
 
         if self.current_workspace_state.is_ai_assistant_panel_open {
@@ -3923,8 +3923,8 @@ impl Workspace {
             .has_warp_drive_initialized_sections(app)
     }
 
-    /// Check if Warp Drive view is focused within.
-    /// Routes to the appropriate Warp Drive panel.
+    /// Check if Zap Drive view is focused within.
+    /// Routes to the appropriate Zap Drive panel.
     fn is_warp_drive_view_focused(&self, ctx: &mut ViewContext<Self>) -> bool {
         let app = ctx;
         self.left_panel_view.is_self_or_child_focused(app)
@@ -4126,7 +4126,7 @@ impl Workspace {
     }
 
     /// This function shifts focus to the panel on the left.
-    /// The current focusable panels are: Warp Drive, theme chooser, AI, and resource center (keyboard shortcuts page only)
+    /// The current focusable panels are: Zap Drive, theme chooser, AI, and resource center (keyboard shortcuts page only)
     fn focus_left_panel(&mut self, ctx: &mut ViewContext<Self>) {
         // Starts from terminal
         if self.active_tab_pane_group().is_self_or_child_focused(ctx) {
@@ -4146,7 +4146,7 @@ impl Workspace {
         {
             self.focus_active_tab(ctx);
         }
-        // Starts from a left panel: Warp Drive
+        // Starts from a left panel: Zap Drive
         else if self.is_warp_drive_view_focused(ctx) {
             if self.current_workspace_state.is_right_panel_open() {
                 self.set_selected_object(None, ctx);
@@ -4191,7 +4191,7 @@ impl Workspace {
                 ctx.focus(&self.theme_chooser_view);
             }
         }
-        // Starts from a left panel: Warp Drive, theme chooser
+        // Starts from a left panel: Zap Drive, theme chooser
         else if self.is_warp_drive_view_focused(ctx)
             || self.theme_chooser_view.is_self_or_child_focused(ctx)
         {
@@ -5198,7 +5198,7 @@ impl Workspace {
                 let pane_group = self.active_tab_pane_group().clone();
                 self.handle_file_tree_event(pane_group, pane_group_event, ctx);
             }
-            LeftPanelEvent::WarpDrive(drive_event) => {
+            LeftPanelEvent::ZapDrive(drive_event) => {
                 self.handle_warp_drive_event(drive_event, ctx);
             }
             LeftPanelEvent::OpenFileWithTarget {
@@ -6261,7 +6261,7 @@ impl Workspace {
     }
 
     /// The tab bar overflow menu is the context menu that appears when
-    /// a user clicks "Update Warp" in the top right of the tab bar.
+    /// a user clicks "Update Zap" in the top right of the tab bar.
     pub fn toggle_tab_bar_overflow_menu(&mut self, ctx: &mut ViewContext<Self>) {
         if self.show_tab_bar_overflow_menu {
             self.close_tab_bar_overflow_menu(ctx);
@@ -6440,7 +6440,7 @@ impl Workspace {
         ctx.notify();
     }
 
-    /// Opens the Warp Drive object identified by `uid` in a new pane
+    /// Opens the Zap Drive object identified by `uid` in a new pane
     /// if it has a pane representation.
     fn open_warp_drive_object_in_new_pane(&mut self, uid: &ObjectUid, ctx: &mut ViewContext<Self>) {
         let Some(object) = ObjectStoreModel::as_ref(ctx).get_by_uid(uid) else {
@@ -6533,7 +6533,7 @@ impl Workspace {
             });
         }
 
-        // Get notebook ID to set Warp drive index selected state
+        // Get notebook ID to set Zap drive index selected state
         if let NotebookSource::Existing(notebook_id) = source {
             let focused_folder_id = settings.focused_folder_id.map(SyncId::ServerId);
             if !notebook_already_open && !default_to_new_pane {
@@ -6562,7 +6562,7 @@ impl Workspace {
         }
     }
 
-    /// Open a Warp Drive workflow in response to an intent URL.
+    /// Open a Zap Drive workflow in response to an intent URL.
     pub fn open_workflow_from_intent(
         &mut self,
         workflow_id: SyncId,
@@ -7164,7 +7164,7 @@ impl Workspace {
         ctx.notify();
     }
 
-    /// Find an active session and pre-fill the input editor the Warp executable with the
+    /// Find an active session and pre-fill the input editor the Zap executable with the
     /// [`warp_cli::Command::DumpDebugInfo`] subcommand.
     fn dump_debug_info(&mut self, ctx: &mut ViewContext<Self>) {
         if let Some(exec) = std::env::current_exe()
@@ -7203,7 +7203,7 @@ impl Workspace {
         }
     }
 
-    /// Install the Warp CLI by creating a symlink in /usr/local/bin
+    /// Install the Zap CLI by creating a symlink in /usr/local/bin
     #[cfg(target_os = "macos")]
     fn install_cli(&mut self, ctx: &mut ViewContext<Self>) {
         ctx.spawn(async { cli_install::install_cli() }, |view, result, ctx| {
@@ -7233,7 +7233,7 @@ impl Workspace {
         });
     }
 
-    /// Uninstall the Warp CLI by removing the symlink from /usr/local/bin
+    /// Uninstall the Zap CLI by removing the symlink from /usr/local/bin
     #[cfg(target_os = "macos")]
     fn uninstall_cli(&mut self, ctx: &mut ViewContext<Self>) {
         ctx.spawn(
@@ -7324,28 +7324,28 @@ impl Workspace {
         explicit_user_action: bool,
         ctx: &mut ViewContext<Self>,
     ) {
-        // Closing all left panels will also close warp drive so we need to retrieve
-        // whether warp drive was open first, and toggle based on the initial value.
+        // Closing all left panels will also close zap drive so we need to retrieve
+        // whether zap drive was open first, and toggle based on the initial value.
         let was_warp_drive_open = self.current_workspace_state.is_warp_drive_open;
         self.current_workspace_state.close_all_left_panels();
         self.current_workspace_state.is_warp_drive_open =
             if toggle { !was_warp_drive_open } else { true };
 
-        // Set selected object to None upon toggle close of Warp Drive
+        // Set selected object to None upon toggle close of Zap Drive
         if !self.current_workspace_state.is_warp_drive_open {
             self.set_selected_object(None, ctx);
             self.focus_active_tab(ctx);
         }
 
-        // Reset focused index when opening/toggling Warp Drive open
+        // Reset focused index when opening/toggling Zap Drive open
         if self.current_workspace_state.is_warp_drive_open {
             self.reset_focused_index_in_warp_drive(true, ctx);
         }
 
         ctx.notify();
 
-        // Telemetry and welcome tip logic is only for when the user explicitly opens Warp Drive
-        // AND warp drive wasn't open before. There are other scenarios where we open Warp Drive like:
+        // Telemetry and welcome tip logic is only for when the user explicitly opens Zap Drive
+        // AND zap drive wasn't open before. There are other scenarios where we open Zap Drive like:
         // new user onboarding, user joins a team, etc so we want to avoid counting those.
         if explicit_user_action
             && !was_warp_drive_open
@@ -8971,7 +8971,7 @@ impl Workspace {
                     // Proc same behavior as DrivePanelEvent::RunWorkflow
                     self.run_cloud_workflow_in_active_input(
                         workflow.clone(),
-                        WorkflowSelectionSource::WarpDrive,
+                        WorkflowSelectionSource::ZapDrive,
                         TerminalSessionFallbackBehavior::default(),
                         ctx,
                     );
@@ -9366,7 +9366,7 @@ impl Workspace {
         let warp_drive_index_width = modal_sizes.map(|ms| {
             ms.warp_drive_index_width
                 .lock()
-                .expect("should be able to lock warp drive resizable state handle")
+                .expect("should be able to lock zap drive resizable state handle")
                 .size()
         });
 
@@ -11712,7 +11712,7 @@ impl Workspace {
                 _ => self.open_navigation_palette(ctx),
             },
             PaletteMode::LaunchConfig => self.open_launch_config_palette(ctx),
-            PaletteMode::WarpDrive => self.open_warp_drive_palette(ctx),
+            PaletteMode::ZapDrive => self.open_warp_drive_palette(ctx),
             PaletteMode::Files => self.open_files_palette(ctx),
             PaletteMode::Conversations => self.open_conversations_palette(ctx),
         }
@@ -11847,11 +11847,11 @@ impl Workspace {
     }
 
     /// This function is used when we set a selected object, which is an object open in an active pane.
-    /// We do not want to focus Warp Drive, instead we want to focus the editor of the open object.
+    /// We do not want to focus Zap Drive, instead we want to focus the editor of the open object.
     fn view_in_warp_drive(&mut self, item_id: WarpDriveItemId, ctx: &mut ViewContext<Self>) {
         self.open_left_panel(ctx);
         self.left_panel_view.update(ctx, |left_panel, ctx| {
-            left_panel.handle_action(&LeftPanelAction::WarpDrive, ctx);
+            left_panel.handle_action(&LeftPanelAction::ZapDrive, ctx);
         });
 
         if let WarpDriveItemId::Object(object_id) = item_id {
@@ -11866,7 +11866,7 @@ impl Workspace {
         });
     }
 
-    /// This function is used when we want to view an item in Warp Drive AND focus Warp Drive.
+    /// This function is used when we want to view an item in Zap Drive AND focus Zap Drive.
     pub fn view_in_and_focus_warp_drive(
         &mut self,
         item_id: WarpDriveItemId,
@@ -11881,7 +11881,7 @@ impl Workspace {
         ctx.notify();
     }
 
-    /// Updates the left panel's warp drive view.
+    /// Updates the left panel's zap drive view.
     fn update_warp_drive_view<F>(&mut self, ctx: &mut ViewContext<Self>, update_fn: F)
     where
         F: FnOnce(&mut DrivePanel, &mut ViewContext<DrivePanel>),
@@ -11970,7 +11970,7 @@ impl Workspace {
             // Zap 去中心化分支:`CheckForUpdate` / `ZapDrive` 事件 arm 随
             // `SettingsViewEvent` 中同名 variant 一同物理删。手动检查更新仍可
             // 由 `WorkspaceAction::CheckForUpdate`(`workspace:check_for_updates` binding)
-            // 触发;Warp Drive 仍可由 `WorkspaceAction::ZapDrive` 触发。
+            // 触发;Zap Drive 仍可由 `WorkspaceAction::ZapDrive` 触发。
             SettingsViewEvent::Pane(_) | SettingsViewEvent::StartResize => {}
             SettingsViewEvent::ShowToast { message, flavor } => {
                 self.toast_stack.update(ctx, |toast_stack, ctx| {
@@ -12321,7 +12321,7 @@ impl Workspace {
                         ctx,
                     ),
                     _ => {
-                        log::warn!("Attempted to open an unsupported Warp Drive link")
+                        log::warn!("Attempted to open an unsupported Zap Drive link")
                     }
                 }
             }
@@ -13046,7 +13046,7 @@ impl Workspace {
                     self.left_panel_view
                         .read(ctx, |left_panel, _| match target_view {
                             LeftPanelTargetView::FileTree => left_panel.is_file_tree_active(),
-                            LeftPanelTargetView::WarpDrive => left_panel.is_warp_drive_active(),
+                            LeftPanelTargetView::ZapDrive => left_panel.is_warp_drive_active(),
                         });
 
                 if self.active_tab_pane_group().as_ref(ctx).left_panel_open && is_target_active {
@@ -13061,7 +13061,7 @@ impl Workspace {
                     self.left_panel_view.update(ctx, |left_panel, ctx| {
                         let action = match target_view {
                             LeftPanelTargetView::FileTree => LeftPanelAction::ProjectExplorer,
-                            LeftPanelTargetView::WarpDrive => LeftPanelAction::WarpDrive,
+                            LeftPanelTargetView::ZapDrive => LeftPanelAction::ZapDrive,
                         };
                         left_panel.handle_action_with_force_open(&action, *force_open, ctx);
                     });
@@ -13543,7 +13543,7 @@ impl Workspace {
             DrivePanelEvent::RunWorkflow(workflow) => {
                 self.run_cloud_workflow_in_active_input(
                     workflow.as_ref().clone(),
-                    WorkflowSelectionSource::WarpDrive,
+                    WorkflowSelectionSource::ZapDrive,
                     TerminalSessionFallbackBehavior::default(),
                     ctx,
                 );
@@ -13577,8 +13577,8 @@ impl Workspace {
             }
             DrivePanelEvent::OpenSearch => {
                 self.open_palette_action(
-                    PaletteMode::WarpDrive,
-                    PaletteSource::WarpDrive,
+                    PaletteMode::ZapDrive,
+                    PaletteSource::ZapDrive,
                     None,
                     ctx,
                 );
@@ -13599,7 +13599,7 @@ impl Workspace {
                 self.open_ai_fact_collection_pane(None, None, ctx);
                 send_telemetry_from_ctx!(
                     TelemetryEvent::KnowledgePaneOpened {
-                        entrypoint: KnowledgePaneEntrypoint::WarpDrive,
+                        entrypoint: KnowledgePaneEntrypoint::ZapDrive,
                     },
                     ctx
                 );
@@ -13609,7 +13609,7 @@ impl Workspace {
 
                 send_telemetry_from_ctx!(
                     TelemetryEvent::MCPServerCollectionPaneOpened {
-                        entrypoint: MCPServerCollectionPaneEntrypoint::WarpDrive,
+                        entrypoint: MCPServerCollectionPaneEntrypoint::ZapDrive,
                     },
                     ctx
                 );
@@ -14716,7 +14716,7 @@ impl Workspace {
     }
 
     fn set_selected_object(&mut self, id: Option<WarpDriveItemId>, ctx: &mut ViewContext<Self>) {
-        // Set Warp drive index selected state
+        // Set Zap drive index selected state
         self.update_warp_drive_view(ctx, |drive_panel, ctx| {
             drive_panel.set_selected_object(id, ctx);
         });
@@ -14831,7 +14831,7 @@ impl Workspace {
                 let command = code.trim().to_string();
                 let args_state =
                     ArgumentsState::for_command_workflow(&Default::default(), command.clone());
-                let workflow = Workflow::new("Command from Warp AI", command)
+                let workflow = Workflow::new("Command from Zap AI", command)
                     .with_arguments(args_state.arguments);
                 self.run_workflow_in_active_input(
                     &WorkflowType::AIGenerated {
@@ -15346,7 +15346,7 @@ impl Workspace {
         let body = appearance
             .ui_builder()
             .wrappable_text(
-                "Ask Warp AI to explain errors, suggest commands or write scripts.".to_owned(),
+                "Ask Zap AI to explain errors, suggest commands or write scripts.".to_owned(),
                 true,
             )
             .with_style(UiComponentStyles {
@@ -15498,7 +15498,7 @@ impl Workspace {
                         .left_panel_views
                         .first()
                         .copied()
-                        .unwrap_or(ToolPanelView::WarpDrive)
+                        .unwrap_or(ToolPanelView::ZapDrive)
                     {
                         ToolPanelView::ProjectExplorer => {
                             crate::t!("workspace-left-panel-project-explorer")
@@ -15506,7 +15506,7 @@ impl Workspace {
                         ToolPanelView::GlobalSearch { .. } => {
                             crate::t!("workspace-left-panel-global-search")
                         }
-                        ToolPanelView::WarpDrive => crate::t!("workspace-left-panel-warp-drive"),
+                        ToolPanelView::ZapDrive => crate::t!("workspace-left-panel-warp-drive"),
                         ToolPanelView::ConversationListView => {
                             crate::t!("workspace-left-panel-agent-conversations")
                         }
@@ -15564,7 +15564,7 @@ impl Workspace {
                 .left_panel_views
                 .first()
                 .copied()
-                .unwrap_or(ToolPanelView::WarpDrive)
+                .unwrap_or(ToolPanelView::ZapDrive)
             {
                 ToolPanelView::ProjectExplorer => {
                     crate::t!("workspace-left-panel-project-explorer")
@@ -15572,7 +15572,7 @@ impl Workspace {
                 ToolPanelView::GlobalSearch { .. } => {
                     crate::t!("workspace-left-panel-global-search")
                 }
-                ToolPanelView::WarpDrive => crate::t!("workspace-left-panel-warp-drive"),
+                ToolPanelView::ZapDrive => crate::t!("workspace-left-panel-warp-drive"),
                 ToolPanelView::ConversationListView => {
                     crate::t!("workspace-left-panel-agent-conversations")
                 }
@@ -15887,7 +15887,7 @@ impl Workspace {
             .is_user_web_anonymous_user()
             .unwrap_or_default();
 
-        // Simplified mode for viewing Warp Drive objects, shared sessions, or conversation transcripts on WASM
+        // Simplified mode for viewing Zap Drive objects, shared sessions, or conversation transcripts on WASM
         #[cfg(target_family = "wasm")]
         if let Some(content_type) = self.get_simplified_wasm_tab_bar_content(ctx) {
             // Use MainAxisAlignment::SpaceBetween and expand to fill width
@@ -15896,10 +15896,10 @@ impl Workspace {
                 .with_main_axis_size(MainAxisSize::Max);
             let bg_color = blended_colors::neutral_1(appearance.theme());
 
-            // Left: Warp logo - clickable to link to warp.dev
+            // Left: Zap logo - clickable to link to warp.dev
             let warp_logo = Hoverable::new(self.mouse_states.warp_logo.clone(), |_state| {
                 ConstrainedBox::new(
-                    warp_core::ui::Icon::Warp
+                    warp_core::ui::Icon::Zap
                         .to_warpui_icon(appearance.theme().foreground())
                         .finish(),
                 )
@@ -15914,7 +15914,7 @@ impl Workspace {
             .finish();
             tab_bar.add_child(warp_logo);
 
-            // Right: Info button + run history button (for agent sessions) + "Open in Warp" button
+            // Right: Info button + run history button (for agent sessions) + "Open in Zap" button
             let mut right_row = Flex::row()
                 .with_cross_axis_alignment(CrossAxisAlignment::Center)
                 .with_main_axis_size(MainAxisSize::Min);
@@ -15938,7 +15938,7 @@ impl Workspace {
                 );
             }
 
-            // Hide "Open in Warp" button on mobile devices
+            // Hide "Open in Zap" button on mobile devices
             if !warpui::platform::wasm::is_mobile_device() {
                 right_row.add_child(ChildView::new(&self.open_in_warp_button).finish());
             }
@@ -16330,7 +16330,7 @@ impl Workspace {
                     .finish(),
             );
         } else {
-            // 去中心化分支:不再渲染 Warp Essentials(灯泡)按钮,只保留设置齿轮。
+            // 去中心化分支:不再渲染 Zap Essentials(灯泡)按钮,只保留设置齿轮。
             target.add_child(
                 Container::new(self.render_settings_button(appearance))
                     .with_margin_left(TAB_BAR_PADDING_LEFT)
@@ -18143,7 +18143,7 @@ impl Workspace {
     fn process_updated_sync_state(&self, ctx: &mut ViewContext<Self>) {
         // If there is an active terminal, return a sync event that all
         // other synced terminals should apply to match it.
-        // If there is no active terminal (like when all Warp windows are
+        // If there is no active terminal (like when all Zap windows are
         // minimized), return an event to start syncing.
         let sync_event = self
             .active_tab_pane_group()
@@ -18248,7 +18248,7 @@ impl Workspace {
             });
         }
         if WarpDriveSettings::is_warp_drive_enabled(ctx) {
-            views.push(ToolPanelView::WarpDrive);
+            views.push(ToolPanelView::ZapDrive);
         }
         // openWarp 独有:SSH 管理器,无 feature flag,默认始终显示。
         views.push(ToolPanelView::SshManager);
@@ -18269,7 +18269,7 @@ impl Workspace {
         });
     }
 
-    /// Opens a given URL in the desktop Warp app if installed, or redirects to download page.
+    /// Opens a given URL in the desktop Zap app if installed, or redirects to download page.
     #[cfg(target_family = "wasm")]
     fn open_link_on_desktop(&mut self, url: &Url, ctx: &mut ViewContext<Self>) {
         use crate::settings::app_installation_detection::{
@@ -18780,7 +18780,7 @@ impl TypedActionView for Workspace {
             }
             ZapDrive => {
                 if WarpDriveSettings::is_warp_drive_enabled(ctx) {
-                    self.open_left_panel_view(&LeftPanelAction::WarpDrive, ctx);
+                    self.open_left_panel_view(&LeftPanelAction::ZapDrive, ctx);
                 }
             }
             ToggleLeftPanel => {
@@ -18818,7 +18818,7 @@ impl TypedActionView for Workspace {
                             ctx
                         );
                     } else if warp_drive_active {
-                        // Tools panel opened with Warp Drive as the active view
+                        // Tools panel opened with Zap Drive as the active view
                         send_telemetry_from_ctx!(
                             TelemetryEvent::WarpDriveOpened {
                                 source: WarpDriveSource::LeftPanelToolbelt,
@@ -19853,8 +19853,8 @@ impl TypedActionView for Workspace {
             ToggleWarpDrive => {
                 if WarpDriveSettings::is_warp_drive_enabled(ctx) {
                     let is_showing =
-                        self.left_panel_view.as_ref(ctx).active_view() == ToolPanelView::WarpDrive;
-                    self.toggle_left_panel_view(&LeftPanelAction::WarpDrive, is_showing, ctx);
+                        self.left_panel_view.as_ref(ctx).active_view() == ToolPanelView::ZapDrive;
+                    self.toggle_left_panel_view(&LeftPanelAction::ZapDrive, is_showing, ctx);
                 }
             }
             ToggleSshManager => {
@@ -20253,7 +20253,7 @@ impl View for Workspace {
 
         let tab_bar_mode = self.tab_bar_mode(app);
 
-        // For WASM simplified tab bar views (Warp Drive objects, shared sessions, conversation transcripts),
+        // For WASM simplified tab bar views (Zap Drive objects, shared sessions, conversation transcripts),
         // we render the tab bar outside of panels so that the details panel only affects content below the tab bar.
         cfg_if::cfg_if! {
             if #[cfg(target_family = "wasm")] {

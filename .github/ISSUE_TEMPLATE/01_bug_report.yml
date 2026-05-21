@@ -8,7 +8,7 @@ body:
         Thanks for helping improve **Zap** — a community fork of Zap focused on BYOP (bring-your-own-provider) AI, local credentials, and a privacy-first terminal.
 
         **Out of scope (please do not file here):**
-        - Zap cloud account / billing / Zap AI quota / Warpify SSO / Zap cloud sync — these belong to upstream Zap, not Zap.
+        - Zap cloud account / billing / Zap AI quota / Warpify SSO / Zap Drive cloud sync — these belong to upstream Zap, not Zap.
         - Issues only reproducible with Zap's first-party cloud agent (Zap ships it disabled).
   - type: checkboxes
     attributes:

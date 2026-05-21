@@ -791,16 +791,16 @@ impl NotificationsTrigger {
     pub fn discovery_banner_copy(&self) -> &'static str {
         match self {
             NotificationsTrigger::LongRunningCommand(..) => {
-                "Warp can notify you when long-running commands finish."
+                "Zap can notify you when long-running commands finish."
             }
             NotificationsTrigger::AgentTaskCompleted(..) => {
-                "Warp can notify you when an agent finishes responding."
+                "Zap can notify you when an agent finishes responding."
             }
             NotificationsTrigger::NeedsAttention => {
-                "Warp can notify you when a command or agent needs your attention."
+                "Zap can notify you when a command or agent needs your attention."
             }
             NotificationsTrigger::PasswordPrompt => {
-                "Warp can notify you when you're prompted to enter a password."
+                "Zap can notify you when you're prompted to enter a password."
             }
         }
     }
@@ -1673,7 +1673,7 @@ pub enum Event {
     BlockStarted {
         is_for_in_band_command: bool,
     },
-    /// Tell the pane group to open a file within Warp.
+    /// Tell the pane group to open a file within Zap.
     OpenFileInWarp {
         path: PathBuf,
         /// The session that the file belongs to.
@@ -1864,7 +1864,7 @@ pub enum LongRunningCommandAgentInteractionState {
 #[derive(Clone, Copy, Debug)]
 pub enum LeftPanelTargetView {
     FileTree,
-    WarpDrive,
+    ZapDrive,
 }
 
 #[derive(Clone)]
@@ -2230,7 +2230,7 @@ impl Default for TerminalViewStateChange {
 }
 
 /// Whether or not this is the active terminal session. The active session for a pane group
-/// is the one used for executing workflows, Warp AI suggestions, etc.
+/// is the one used for executing workflows, Zap AI suggestions, etc.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ActiveSessionState {
     Active,
@@ -2406,7 +2406,7 @@ pub struct TerminalView {
     control_master_error_banner_state: ControlMasterErrorBannerState,
 
     /// Banner to show if we detect a configuration in the user's rc files that
-    /// is incompatible with Warp.
+    /// is incompatible with Zap.
     incompatible_configuration_banner: ViewHandle<Banner<TerminalAction>>,
     is_incompatible_configuration_banner_open: bool,
 
@@ -4332,7 +4332,7 @@ impl TerminalView {
     /// Returns whether this terminal view should subscribe to git status
     /// updates. We subscribe when:
     /// 1. Agent mode is active and its chip list includes `GitDiffStats`, or
-    /// 2. Terminal mode with the Warp prompt enabled and the git stats chip
+    /// 2. Terminal mode with the Zap prompt enabled and the git stats chip
     ///    configured.
     #[cfg(feature = "local_fs")]
     fn should_subscribe_to_git_status(&self, ctx: &AppContext) -> bool {
@@ -4344,7 +4344,7 @@ impl TerminalView {
                 .contains(&ContextChipKind::GitDiffStats);
         }
 
-        // Terminal prompt path: the Warp prompt is active when honor_ps1 is
+        // Terminal prompt path: the Zap prompt is active when honor_ps1 is
         // off, or when UDI overrides PS1. GitDiffStats must also be in the
         // configured chip list.
         let is_using_warp_prompt = !*SessionSettings::as_ref(ctx).honor_ps1
@@ -8230,11 +8230,11 @@ impl TerminalView {
 
         let a11y_message = match &warpify_keybinding {
             Some(keystroke) => format!(
-                "You can press {} to Warpify this {} for more Warp features.",
+                "You can press {} to Warpify this {} for more Zap features.",
                 keystroke.displayed(),
                 lowercase_title
             ),
-            None => format!("You can Warpify this {lowercase_title} for more Warp features."),
+            None => format!("You can Warpify this {lowercase_title} for more Zap features."),
         };
 
         model
@@ -8397,7 +8397,7 @@ impl TerminalView {
 
         let a11y_content = AccessibilityContent::new(
             banner_title,
-            "Make sure you have enabled access for Warp notifications in System Preferences.",
+            "Make sure you have enabled access for Zap notifications in System Preferences.",
             WarpA11yRole::TextRole,
         );
         ctx.emit_a11y_content(a11y_content);
@@ -9119,7 +9119,7 @@ impl TerminalView {
         reset_focus
     }
 
-    /// Recomputes the chip values for the Warp prompt (i.e. _not_ PS1).
+    /// Recomputes the chip values for the Zap prompt (i.e. _not_ PS1).
     fn refresh_warp_prompt(&mut self, ctx: &mut ViewContext<Self>) {
         // Ask the per-repo sub-model to re-fetch metadata so the chip values
         // reflect the latest git state (branch, diff stats, etc.).
@@ -9955,7 +9955,7 @@ impl TerminalView {
                         );
 
                         // On dogfood only, we're interested in the block commands, durations,
-                        // and exit codes to trial Warp Analytics.
+                        // and exit codes to trial Zap Analytics.
                         if ChannelState::channel().is_dogfood() {
                             send_telemetry_from_ctx!(
                                 TelemetryEvent::BlockCompletedOnDogfoodOnly {
@@ -11230,7 +11230,7 @@ impl TerminalView {
 
         // Desktop notifications for CLI agents use the user's notification settings
         // directly. CLI agent notifications are explicit agent lifecycle events,
-        // so they should still notify when Warp is focused.
+        // so they should still notify when Zap is focused.
         if matches!(status, CLIAgentSessionStatus::InProgress) {
             return;
         }
@@ -11436,7 +11436,7 @@ impl TerminalView {
 
         // Now that the session is bootstrapped, update any restored AI blocks that were
         // created before bootstrapping with the shell launch data. This enables file link
-        // detection and the "Open in Warp" button on code blocks in restored conversations.
+        // detection and the "Open in Zap" button on code blocks in restored conversations.
         if let Some(shell_launch_data) = self.active_session.as_ref(ctx).shell_launch_data(ctx) {
             let ai_block_handles: Vec<_> = self
                 .rich_content_views
@@ -13244,7 +13244,7 @@ impl TerminalView {
     }
 
     /// Shared logic for sending a desktop notification (or showing a discovery banner)
-    /// for any agent status change (both Warp's agent and any CLI agent).
+    /// for any agent status change (both Zap's agent and any CLI agent).
     fn send_agent_desktop_notification_or_show_banner(
         &mut self,
         trigger: NotificationsTrigger,
@@ -13963,7 +13963,7 @@ impl TerminalView {
                                         .with_on_select_action(TerminalAction::OpenFileInWarp(path))
                                         .into_item(),
                                 );
-                                // Because the default for cmd-click is to open in Warp, we also
+                                // Because the default for cmd-click is to open in Zap, we also
                                 // have an open-in-editor option.
                                 items.push(
                                     MenuItemFields::new(crate::t!("menu-block-open-in-editor"))
@@ -14663,7 +14663,7 @@ impl TerminalView {
 
         // Zap:删除 session_sharing_context_menu_items(云端 shared session 入口)
 
-        // Section 2: AI Command Search, Ask Warp AI
+        // Section 2: AI Command Search, Ask Zap AI
         items.extend([
             MenuItem::Separator,
             MenuItemFields::new(crate::t!("menu-input-command-search"))
@@ -16254,7 +16254,7 @@ impl TerminalView {
         self.paste(true, ctx);
     }
 
-    /// Tell the pane group to open a file within Warp.
+    /// Tell the pane group to open a file within Zap.
     fn open_file_in_warp(&mut self, path: PathBuf, ctx: &mut ViewContext<Self>) {
         if let Some(session) = self
             .active_block_session_id()
@@ -20243,7 +20243,7 @@ impl TerminalView {
                     self.update_incompatible_configuration_banner(session.shell().plugins(), ctx)
                 }
 
-                // honor_ps1 affects whether the Warp prompt is active, which
+                // honor_ps1 affects whether the Zap prompt is active, which
                 // determines if we need git status updates.
                 self.update_git_status_subscription(ctx);
             }

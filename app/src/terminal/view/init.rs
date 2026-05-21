@@ -1055,7 +1055,7 @@ fn register_input_mode_bindings(app: &mut AppContext) {
 
     // A context predicate that matches when the input mode bindings are
     // available for use. Disabled when a CLI agent session is active — the
-    // Warp agent should not be tagged into a CLI agent's command, and the
+    // Zap agent should not be tagged into a CLI agent's command, and the
     // `!` prefix is the only way to toggle shell mode in the rich input.
     let base_context = id!(flags::IS_ANY_AI_ENABLED)
         & (id!("Input") | id!("Terminal"))

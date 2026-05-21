@@ -68,7 +68,7 @@ impl View for WarpDriveSettingsPageView {
 
 impl SettingsPageMeta for WarpDriveSettingsPageView {
     fn section() -> SettingsSection {
-        SettingsSection::WarpDrive
+        SettingsSection::ZapDrive
     }
 
     fn should_render(&self, _ctx: &AppContext) -> bool {
@@ -90,7 +90,7 @@ impl SettingsPageMeta for WarpDriveSettingsPageView {
 
 impl From<ViewHandle<WarpDriveSettingsPageView>> for SettingsPageViewHandle {
     fn from(view_handle: ViewHandle<WarpDriveSettingsPageView>) -> Self {
-        SettingsPageViewHandle::WarpDrive(view_handle)
+        SettingsPageViewHandle::ZapDrive(view_handle)
     }
 }
 
@@ -104,7 +104,7 @@ impl SettingsWidget for WarpDriveToggleWidget {
     type View = WarpDriveSettingsPageView;
 
     fn search_terms(&self) -> &str {
-        "warp drive tools panel command palette search workflows prompts notebooks environment variables"
+        "zap drive tools panel command palette search workflows prompts notebooks environment variables"
     }
 
     fn render(
@@ -116,7 +116,7 @@ impl SettingsWidget for WarpDriveToggleWidget {
         let settings = WarpDriveSettings::as_ref(app);
 
         render_body_item::<WarpDriveSettingsPageAction>(
-            "Warp Drive".into(),
+            "Zap Drive".into(),
             Some(AdditionalInfo {
                 mouse_state: self.info_icon_mouse_state.clone(),
                 on_click_action: Some(WarpDriveSettingsPageAction::OpenUrl(
@@ -137,7 +137,7 @@ impl SettingsWidget for WarpDriveToggleWidget {
                     ctx.dispatch_typed_action(WarpDriveSettingsPageAction::ToggleShowWarpDrive);
                 })
                 .finish(),
-            Some("Warp Drive is a local workspace in your terminal where you can save Workflows, Notebooks, Prompts, and Environment Variables on this device.".into()),
+            Some("Zap Drive is a local workspace in your terminal where you can save Workflows, Notebooks, Prompts, and Environment Variables on this device.".into()),
         )
     }
 }

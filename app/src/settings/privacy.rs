@@ -93,7 +93,7 @@ impl PartialEq for CustomSecretRegex {
 
 impl settings_value::SettingsValue for CustomSecretRegex {}
 
-// openWarp 闭源遥测剥离:三个隐私开关默认值 true → false。原 Warp 默认开是商业产品的
+// openWarp 闭源遥测剥离:三个隐私开关默认值 true → false。原 Zap 默认开是商业产品的
 // "选择退出"模式;Zap 已物理切断遥测、崩溃上报、云端对话存储三条外发链路,
 // 默认开关只会在新用户面前显示 ON 但实际不外发,造成认知割裂。改为默认 OFF。
 define_settings_group!(WarpDrivePrivacySettings, settings: [
@@ -248,7 +248,7 @@ impl PrivacySettings {
             .unwrap_or(false);
 
         // Make sure the user-preferences stores match what's in memory.
-        // Needed for warp drive preferences to work and no harm in doing in general.
+        // Needed for zap drive preferences to work and no harm in doing in general.
         let _ = ctx.private_user_preferences().write_value(
             TELEMETRY_ENABLED_DEFAULTS_KEY,
             serde_json::to_string(&is_telemetry_enabled)
@@ -605,14 +605,14 @@ impl PrivacySettings {
     /// 剥离后纯本地落盘(调用方仍会写 settings.toml + warp_drive 本地缓存),无外发。
     fn update_server_with_local_settings(&self, _ctx: &mut ModelContext<Self>) {}
 
-    /// We wait until warp drive prefs have loaded and then either
+    /// We wait until zap drive prefs have loaded and then either
     /// 1) use them as the data store for is_telemetry_enabled and is_crash_reporting_enabled, if those
-    ///    values are set in warp drive, or
-    /// 2) update the warp drive prefs to match the values from the legacy user_settings endpoint so
-    ///    that we can use warp drive prefs going forward.
+    ///    values are set in zap drive, or
+    /// 2) update the zap drive prefs to match the values from the legacy user_settings endpoint so
+    ///    that we can use zap drive prefs going forward.
     pub fn maybe_sync_with_warp_drive_prefs(&mut self, ctx: &mut ModelContext<Self>) {
-        // Wait for cloud objects to load, and, if telemetry & crash reporting are synced to warp drive
-        // initialize from the warp drive values.
+        // Wait for cloud objects to load, and, if telemetry & crash reporting are synced to zap drive
+        // initialize from the zap drive values.
         ctx.spawn(
             ObjectStoreModel::as_ref(ctx).initial_load_complete(),
             Self::handle_warp_drive_objects_loaded,
@@ -621,9 +621,9 @@ impl PrivacySettings {
 
     fn handle_warp_drive_objects_loaded(&mut self, _: (), ctx: &mut ModelContext<Self>) {
         self.initialize_default_regexes_once(ctx);
-        // Check if the warp drive preferences are set. If they are, and telemetry and crash reporting
-        // are set as warp drive prefs, then use those.  Otherwise, update the warp drive prefs to match
-        // the values from the legacy user_settings endpoint so that we can use warp drive prefs going forward.
+        // Check if the zap drive preferences are set. If they are, and telemetry and crash reporting
+        // are set as zap drive prefs, then use those.  Otherwise, update the zap drive prefs to match
+        // the values from the legacy user_settings endpoint so that we can use zap drive prefs going forward.
         let object_store_model = ObjectStoreModel::as_ref(ctx);
         let cloud_prefs = object_store_model.get_all_preferences_by_storage_key();
         let cloud_telemetry_value =
@@ -649,7 +649,7 @@ impl PrivacySettings {
         match (cloud_telemetry_value, cloud_crash_reporting_value) {
             (Some(is_telemetry_enabled), Some(is_crash_reporting_enabled)) => {
                 log::info!(
-                    "Warp Drive privacy preferences are set, using those for telemetry={is_telemetry_enabled}, \
+                    "Zap Drive privacy preferences are set, using those for telemetry={is_telemetry_enabled}, \
                     crash_reporting={is_crash_reporting_enabled}"
                 );
                 self.set_is_telemetry_enabled(is_telemetry_enabled, ctx);
@@ -657,7 +657,7 @@ impl PrivacySettings {
             }
             _ => {
                 log::info!(
-                    "Warp Drive privacy preferences are not set, syncing local PrivacySettings values to \
+                    "Zap Drive privacy preferences are not set, syncing local PrivacySettings values to \
                     WarpDrivePrivacySettings and cloud. telemetry={}, crash_reporting={}",
                     self.is_telemetry_enabled,
                     self.is_crash_reporting_enabled

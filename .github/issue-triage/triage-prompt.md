@@ -75,7 +75,7 @@ Use area labels based on the user's reported surface:
 - `area:code-review` for git diff views, review UI, review comments, and PR-focused agent flows.
 - `area:mcp` for MCP server connection, tool/resource discovery, OAuth, and integration issues.
 - `area:settings-keybindings` for settings UI, preferences, keyboard shortcuts, and keybinding configuration.
-- `area:warp-drive` for Zap objects, sync, sharing, workflows, notebooks, tab configs, and persisted artifacts.
+- `area:warp-drive` for Zap Drive objects, sync, sharing, workflows, notebooks, tab configs, and persisted artifacts.
 - `area:performance:*` when the report includes CPU, memory, GPU, startup, rendering, latency, or responsiveness symptoms. Add the more specific CPU, memory, or GPU label when the evidence points to that resource.
 
 ## Information to check for before asking follow-up questions

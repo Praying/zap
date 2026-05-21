@@ -671,7 +671,7 @@ impl AISettingsPageView {
         });
         // The coding agent footer command editor is always enabled,
         // independent of the global AI toggle, because it controls
-        // third-party coding agents rather than Warp's own AI.
+        // third-party coding agents rather than Zap's own AI.
         Self::update_editor_interaction_state(
             cli_agent_footer_command_editor.as_ref(ctx).editor().clone(),
             true,
@@ -5017,7 +5017,7 @@ impl AgentsWidget {
         let subtext = {
             let subtext_fragments = vec![
                 FormattedTextFragment::plain_text(
-                    "You haven't added any MCP servers yet. Once you do, you'll be able to control how much autonomy the Warp Agent has when interacting with them. ",
+                    "You haven't added any MCP servers yet. Once you do, you'll be able to control how much autonomy the Zap Agent has when interacting with them. ",
                 ),
                 FormattedTextFragment::hyperlink_action(
                     crate::t!("settings-ai-add-server"),
@@ -5497,7 +5497,7 @@ impl SettingsWidget for MCPServersWidget {
 
         let mcp_description = vec![
             FormattedTextFragment::plain_text(
-                "Add MCP servers to extend the Warp Agent's capabilities. \
+                "Add MCP servers to extend the Zap Agent's capabilities. \
             MCP servers expose data sources or tools to agents through a standardized interface, essentially acting like plugins. ",
             ),
             FormattedTextFragment::hyperlink(
@@ -5695,7 +5695,7 @@ impl SettingsWidget for AIFactWidget {
     type View = AISettingsPageView;
 
     fn search_terms(&self) -> &str {
-        "agent oz ai a.i. knowledge fact memory memories rules warp drive context workflows notebooks environment variables"
+        "agent oz ai a.i. knowledge fact memory memories rules zap drive context workflows notebooks environment variables"
     }
 
     fn should_render(&self, _app: &AppContext) -> bool {
@@ -5735,7 +5735,7 @@ impl SettingsWidget for AIFactWidget {
             column.add_child(self.render_rule_suggestions_toggle(view, ai_settings, app));
         }
 
-        // 去中心化分支:不再渲染 "Warp Drive as agent context" 开关。
+        // 去中心化分支:不再渲染 "Zap Drive as agent context" 开关。
         let _ = self;
         let _ = view;
         column.with_child(button).finish()
@@ -5769,7 +5769,7 @@ impl VoiceWidget {
 
         let voice_input_description_text_fragments = vec![
             FormattedTextFragment::plain_text(
-                "Voice input allows you to control Warp by speaking directly to your terminal (powered by ",
+                "Voice input allows you to control Zap by speaking directly to your terminal (powered by ",
             ),
             FormattedTextFragment::hyperlink("Wispr Flow", WISPR_FLOW_URL),
             FormattedTextFragment::plain_text(")."),
@@ -6023,7 +6023,7 @@ impl SettingsWidget for CLIAgentWidget {
 
         // The Coding Agents section is always enabled, independent of the
         // global AI toggle, because these settings control third-party coding
-        // agents (Claude Code, Codex, Gemini CLI) rather than Warp's own AI.
+        // agents (Claude Code, Codex, Gemini CLI) rather than Zap's own AI.
         let cli_agent_footer_toggle = render_ai_setting_toggle::<ShouldRenderCLIAgentToolbar>(
             crate::t!("settings-ai-show-coding-agent-toolbar"),
             AISettingsPageAction::ToggleCLIAgentToolbar,

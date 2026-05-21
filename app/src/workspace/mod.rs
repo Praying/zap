@@ -1033,7 +1033,7 @@ pub fn init(app: &mut AppContext) {
             "workspace:search_drive",
             crate::t!("keybinding-desc-workspace-search-drive"),
             WorkspaceAction::OpenPalette {
-                mode: PaletteMode::WarpDrive,
+                mode: PaletteMode::ZapDrive,
                 source: PaletteSource::Keybinding,
                 query: None,
             },
@@ -1160,7 +1160,7 @@ pub fn init(app: &mut AppContext) {
         .with_context_predicate(id!("Workspace") & id!(flags::IS_ANY_AI_ENABLED))
         .with_group(bindings::BindingGroup::WarpAi.as_str())
         // We use the same custom action as AM so that we don't have
-        // two mac menu items for AM vs Warp AI since they are mutually exclusive.
+        // two mac menu items for AM vs Zap AI since they are mutually exclusive.
         .with_custom_action(CustomAction::NewAgentModePane),
     ]);
 

@@ -81,7 +81,7 @@ impl IntentionSlide {
 
         let title = appearance
             .ui_builder()
-            .paragraph(localized("onboarding-intention-title", "Welcome to Warp"))
+            .paragraph(localized("onboarding-intention-title", "Welcome to Zap"))
             .with_style(UiComponentStyles {
                 font_size: Some(36.),
                 font_weight: Some(Weight::Medium),
@@ -256,7 +256,7 @@ impl IntentionSlide {
 
         let checklist = {
             let items = [
-                localized("onboarding-ai-feature-warp-agents", "Warp agents"),
+                localized("onboarding-ai-feature-warp-agents", "Zap agents"),
                 localized(
                     "onboarding-ai-feature-oz-cloud-agents-platform",
                     "Oz local agents platform",
@@ -433,7 +433,7 @@ impl IntentionSlide {
 
         let new_settings_modes = FeatureFlag::ZapNewSettingsModes.is_enabled();
         let next_text = if !new_settings_modes && selected_index == 1 {
-            localized("common-get-warping", "Get Warping")
+            localized("common-get-warping", "Get Zapping")
         } else {
             localized("common-next", "Next")
         };

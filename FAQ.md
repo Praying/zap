@@ -90,7 +90,7 @@ No. Zap does not use contributions to this repository, or the discussion around 
 
 ### Is Zap fully open source?
 
-The Zap **client** is open source: the app and most crates are licensed under [AGPL v3](LICENSE-AGPL), and the UI framework crates (`warpui_core`, `warpui`) are licensed under [MIT](LICENSE-MIT). The **server**, the **Zap backend**, and **Oz** (our agent orchestration layer) are not in this repository and remain proprietary today.
+The Zap **client** is open source: the app and most crates are licensed under [AGPL v3](LICENSE-AGPL), and the UI framework crates (`warpui_core`, `warpui`) are licensed under [MIT](LICENSE-MIT). The **server**, the **Zap Drive backend**, and **Oz** (our agent orchestration layer) are not in this repository and remain proprietary today.
 
 ### What lives in this repo and what doesn't?
 

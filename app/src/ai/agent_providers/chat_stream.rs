@@ -2621,7 +2621,7 @@ fn is_plan_mode_turn(input: &[AIAgentInput]) -> bool {
 /// 工具不在 tool list 里就调用不到(provider 协议层会直接拒绝 unknown function)。
 ///
 /// **没被 BLOCK 的写类工具**:`create_documents` / `edit_documents`。它们只动
-/// Warp Drive 本地文档存储(AIDocumentModel),不碰文件系统、不跑命令,语义上
+/// Zap Drive 本地文档存储(AIDocumentModel),不碰文件系统、不跑命令,语义上
 /// 恰好是 Plan Mode 的产出归档动作 —— 模型把最终 plan 沉淀为 Drive 文档,
 /// 用户后续可在 Drive UI 中查看 / 编辑 / 拖入自建的 PLAN 文件夹复用。
 ///
@@ -2953,7 +2953,7 @@ fn dashscope_needs_enable_thinking(
 /// `opencode*` 这五个 provider 会下发。其余 provider(含所有 OpenAI 兼容
 /// 中转 / 本地服务 / 大部分国内云)一律不发。
 ///
-/// Warp 这边没有 `providerID` 这个维度,只有用户自由填写的 `base_url`。
+/// Zap 这边没有 `providerID` 这个维度,只有用户自由填写的 `base_url`。
 /// 因此通过 `base_url` 反推:
 /// - `api.openai.com`           → "openai"
 /// - `*.openai.azure.com`       → "azure"
@@ -3009,7 +3009,7 @@ fn build_chat_options(
     //    `openai` / `azure` / `openrouter` / `venice` / `opencode`。其余 provider
     //    (含所有 OpenAI 兼容中转 / 国内云 / 本地服务)一律不发。
     //
-    //    opencode 用 `providerID`(用户 config 选的字符串)做判定;Warp 这边没有
+    //    opencode 用 `providerID`(用户 config 选的字符串)做判定;Zap 这边没有
     //    `providerID`,只能用 `base_url` 反推 → 见 `opencode_compatible_cache_provider`。
     //    这是 base_url 唯一的语义用途,不要扩展到决定 cache 之外的行为。
     //

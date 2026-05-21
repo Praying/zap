@@ -359,7 +359,7 @@ pub struct BlocklistAIController {
     shared_session_state: shared_session::SharedSessionState,
 
     /// Ambient agent task ID attached to this controller. This is a property of the controller, and not an individual
-    /// conversation, because the ambient agent task driver owns the entire Warp window working on a task, and any
+    /// conversation, because the ambient agent task driver owns the entire Zap window working on a task, and any
     /// sessions within it. In the future, one task may span several sessions with background processes.
     ambient_agent_task_id: Option<AmbientAgentTaskId>,
 
@@ -3873,7 +3873,7 @@ fn get_running_command(terminal_model: &TerminalModel) -> Option<RunningCommand>
 
 /// Zap BYOP 专用:LRC tag-in / agent-monitored 场景下提取 RunningCommand。
 ///
-/// 上游 `get_running_command` 在 `is_agent_monitoring()` 时返回 None — 因为 Warp 自家
+/// 上游 `get_running_command` 在 `is_agent_monitoring()` 时返回 None — 因为 Zap 自家
 /// 路径下 LRC 已 spawn cli subagent 后,server 端持久该状态,后续轮 client 不必重发
 /// running_command。但 BYOP 直连模型无服务端持久,**每轮都要把当前 PTY grid 内容
 /// 重新带给模型**(否则模型只能看到首轮 grid_contents 之后的盲区)。

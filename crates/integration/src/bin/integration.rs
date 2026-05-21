@@ -8,7 +8,7 @@ use warp_cli::WorkerCommand;
 use warp_core::channel::{Channel, ChannelConfig, ChannelState};
 use warp_core::AppId;
 
-/// The Warp integration test runner.
+/// The Zap integration test runner.
 #[derive(Debug, Default, Parser, Clone)]
 #[command(name = "warp-integration-test")]
 #[clap(args_conflicts_with_subcommands = true)]
@@ -30,7 +30,7 @@ pub fn main() -> Result<()> {
                 "dev",
                 "warp",
                 if cfg!(target_os = "macos") {
-                    "Warp-Integration"
+                    "Zap-Integration"
                 } else {
                     "WarpIntegration"
                 },

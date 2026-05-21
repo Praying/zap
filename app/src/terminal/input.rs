@@ -854,7 +854,7 @@ struct ViewerCommandExecutionRequest {
 /// Where a command execution request originates from.
 #[derive(Clone)]
 pub enum CommandExecutionSource {
-    /// A non-shared command execution request from Warp AI++.
+    /// A non-shared command execution request from Zap AI++.
     /// Shared commands use the SharedSession variant instead.
     AI {
         /// Metadata associated with the execution.
@@ -5059,7 +5059,7 @@ impl Input {
             }
             (InputType::AI, _) => {
                 // Follow the `agent_indicator` pattern (see `app/src/tab.rs`):
-                //  * `None` (no conversation, empty, passive, or untitled) => new conversation => "Warp anything"
+                //  * `None` (no conversation, empty, passive, or untitled) => new conversation => "Zap anything"
                 //  * `InProgress`                                           => agent running    => "Steer"
                 //  * Any other status                                       => finished         => "Ask a follow up"
                 match self
@@ -5401,7 +5401,7 @@ impl Input {
         });
     }
 
-    /// Predicts the next action using an AI model and past context on blocks within Warp.
+    /// Predicts the next action using an AI model and past context on blocks within Zap.
     /// Populates the autosuggestion with the predicted action, if any. Otherwise, falls back to
     /// existing autosuggestion logic.
     #[cfg_attr(target_family = "wasm", allow(unused_variables))]
@@ -6559,7 +6559,7 @@ impl Input {
             .string_model;
 
         if shell_type == ShellType::Fish {
-            // Warp currently doesn't support newlines in Fish, just prepend the vars
+            // Zap currently doesn't support newlines in Fish, just prepend the vars
             let mut command = env_vars.export_variables_for_shell(ShellType::Fish);
             command.push(' ');
             Some(command)
@@ -12911,7 +12911,7 @@ impl Input {
                                 .cloned(),
                             workflow_selection_source: selected_workflow_state
                                 .workflow_selection_source,
-                            // This is only `Some()` for WarpDrive workflows; we don't track
+                            // This is only `Some()` for ZapDrive workflows; we don't track
                             // ID for execution of local workflows because they have no such
                             // unique ID.
                             workflow_id: selected_workflow_state.workflow_type.server_id(),

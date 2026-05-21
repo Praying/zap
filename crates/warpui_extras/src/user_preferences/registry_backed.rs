@@ -43,7 +43,7 @@ impl RegistryBackedPreferences {
         }
     }
 
-    /// 用回调操作缓存的 Warp 注册表 Key。第一次会 `CURRENT_USER.create(...)`,
+    /// 用回调操作缓存的 Zap 注册表 Key。第一次会 `CURRENT_USER.create(...)`,
     /// 后续直接复用。如果 Key 锁中毒(之前 panic),fallback 到一次性 create
     /// 而不缓存 —— 行为退化但不会进一步 panic。
     fn with_warp_registry<R>(
@@ -57,7 +57,7 @@ impl RegistryBackedPreferences {
                 let key = CURRENT_USER
                     .create(self.app_key_path.clone())
                     .map_err(|e| {
-                        log::error!("unable to access Warp app key in Windows Registry: {e:#}");
+                        log::error!("unable to access Zap app key in Windows Registry: {e:#}");
                         super::Error::IoError(io::Error::from(e))
                     })?;
                 return f(&key);
@@ -68,7 +68,7 @@ impl RegistryBackedPreferences {
             let key = CURRENT_USER
                 .create(self.app_key_path.clone())
                 .map_err(|e| {
-                    log::error!("unable to access Warp app key in Windows Registry: {e:#}");
+                    log::error!("unable to access Zap app key in Windows Registry: {e:#}");
                     super::Error::IoError(io::Error::from(e))
                 })?;
             *guard = Some(key);

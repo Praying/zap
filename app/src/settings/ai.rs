@@ -1129,7 +1129,7 @@ impl settings_value::SettingsValue for BYOPLastUsedReasoningMap {
 }
 
 define_settings_group!(AISettings, settings: [
-    // 历史遗留设置。Zap 的 Warp 智能体现在固定开启,不要用这个字段判断启用状态。
+    // 历史遗留设置。Zap 的 Zap 智能体现在固定开启,不要用这个字段判断启用状态。
     is_any_ai_enabled: IsAnyAIEnabled {
         type: bool,
         default: true,
@@ -1428,7 +1428,7 @@ define_settings_group!(AISettings, settings: [
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,
         toml_path: "cloud_platform.third_party_api_keys.aws_bedrock_credentials_enabled",
-        description: "Whether Warp should use your local AWS credentials for Bedrock-enabled requests.",
+        description: "Whether Zap should use your local AWS credentials for Bedrock-enabled requests.",
     }
     // Whether to automatically run the AWS login command when Bedrock credentials are expired.
     //
@@ -1483,7 +1483,7 @@ define_settings_group!(AISettings, settings: [
         toml_path: "agents.knowledge.rules_enabled",
         description: "Whether the agent uses your saved rules during requests.",
     }
-    // Whether warp drive context should be included in AI requests
+    // Whether zap drive context should be included in AI requests
     warp_drive_context_enabled: WarpDriveContextEnabled {
         type: bool,
         default: true,
@@ -1491,7 +1491,7 @@ define_settings_group!(AISettings, settings: [
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,
         toml_path: "agents.knowledge.warp_drive_context_enabled",
-        description: "Whether Warp Drive context is included in AI requests.",
+        description: "Whether Zap Drive context is included in AI requests.",
     }
 
     // Whether the agent mode setup banner has been shown for a given repo path.
@@ -1548,7 +1548,7 @@ define_settings_group!(AISettings, settings: [
         private: true,
     }
 
-    // Whether or not the user has enabled the ability to use Warp credits even when providing
+    // Whether or not the user has enabled the ability to use Zap credits even when providing
     // their own LLM provider API key.
     can_use_warp_credits_with_byok: CanUseWarpCreditsWithByok {
         type: bool,
@@ -1557,7 +1557,7 @@ define_settings_group!(AISettings, settings: [
         sync_to_cloud: SyncToCloud::Globally(RespectUserSyncSetting::Yes),
         private: false,
         toml_path: "cloud_platform.third_party_api_keys.can_use_warp_credits_with_byok",
-        description: "Whether Warp credits can be used even when providing your own API key.",
+        description: "Whether Zap credits can be used even when providing your own API key.",
     }
 
     should_render_use_agent_footer_for_user_commands: ShouldRenderUseAgentToolbarForUserCommands {
@@ -1702,7 +1702,7 @@ define_settings_group!(AISettings, settings: [
     }
 
     // Whether file-based MCP servers from third-party AI tools (e.g. Claude, Codex) should
-    // be automatically detected and spawned. Warp-native config files (.warp/.mcp.json) are
+    // be automatically detected and spawned. Zap-native config files (.warp/.mcp.json) are
     // always detected and spawned, regardless of this setting.
     file_based_mcp_enabled: FileBasedMcpEnabled {
         type: bool,
@@ -1931,7 +1931,7 @@ impl AISettings {
     }
 
     pub fn is_any_ai_enabled(&self, _app: &AppContext) -> bool {
-        // Zap 不再允许通过设置关闭 Warp 智能体。旧配置文件里持久化的
+        // Zap 不再允许通过设置关闭 Zap 智能体。旧配置文件里持久化的
         // `agents.warp_agent.is_any_ai_enabled = false` 会被忽略。
         true
     }

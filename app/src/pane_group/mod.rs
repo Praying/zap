@@ -203,7 +203,7 @@ fn get_minimum_pane_size(app: &AppContext) -> f32 {
 /// 2. Otherwise look up by command name in the already-discovered
 ///    [`AvailableShells`]. Its shell discovery supplements the process `PATH`
 ///    with well-known install locations (e.g. `/opt/homebrew/bin` on macOS,
-///    MSYS2/WSL on Windows) that a raw `PATH` lookup would miss when Warp is
+///    MSYS2/WSL on Windows) that a raw `PATH` lookup would miss when Zap is
 ///    launched outside an interactive shell.
 /// 3. As a final fallback, perform a plain `PATH` lookup via
 ///    [`AvailableShell::try_from`] in case the user put something exotic in
@@ -478,7 +478,7 @@ pub enum Event {
     OpenPromptEditor,
     OpenAgentToolbarEditor,
     OpenCLIAgentToolbarEditor,
-    /// tell the workspace to open a file within Warp.
+    /// tell the workspace to open a file within Zap.
     OpenFileInWarp {
         /// The file path to open.
         path: PathBuf,
@@ -2278,7 +2278,7 @@ impl PaneGroup {
     }
 
     /// Send prompt change bindkey events to all terminal sessions in this pane group. This
-    /// is used for intra-session prompt switching between Warp prompt and PS1.
+    /// is used for intra-session prompt switching between Zap prompt and PS1.
     #[cfg_attr(not(feature = "local_tty"), allow(unused_variables))]
     pub fn send_prompt_change_bindkey_to_all_sessions(
         &self,
@@ -2416,7 +2416,7 @@ impl PaneGroup {
             Banner::<PaneGroupAction>::new_permanently_dismissible(
                 BannerTextContent::formatted_text(vec![
                     FormattedTextFragment::plain_text(
-                        "Warp doesn't currently support your default shell, falling back to zsh.  ",
+                        "Zap doesn't currently support your default shell, falling back to zsh.  ",
                     ),
                     FormattedTextFragment::hyperlink(
                         crate::t!("common-learn-more"),
@@ -3223,7 +3223,7 @@ impl PaneGroup {
 
         let _ = ambient_agent_task_id;
 
-        // Insert the conversation ended tombstone (includes Open in Warp button on WASM).
+        // Insert the conversation ended tombstone (includes Open in Zap button on WASM).
         if terminal_manager.is_some() {
             terminal_view.update(ctx, |view, ctx| {
                 view.insert_conversation_ended_tombstone(ctx);
@@ -4897,7 +4897,7 @@ impl PaneGroup {
         });
 
         let terminal_view = terminal_manager.as_ref(ctx).view();
-        // Insert the conversation ended tombstone (includes Open in Warp button on WASM)
+        // Insert the conversation ended tombstone (includes Open in Zap button on WASM)
         terminal_view.update(ctx, |view, ctx| {
             view.insert_conversation_ended_tombstone(ctx);
         });

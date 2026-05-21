@@ -147,7 +147,7 @@ pub struct BlockLatencyInfo {
     pub execution_ms: u64,
 }
 
-// Compatibility metadata for local Warp Drive object event shells.
+// Compatibility metadata for local Zap Drive object event shells.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TelemetryObjectType {
     Workflow,
@@ -190,7 +190,7 @@ impl From<Space> for TelemetrySpace {
     }
 }
 
-/// Common metadata retained for local Warp Drive event call sites that act on a specific object.
+/// Common metadata retained for local Zap Drive event call sites that act on a specific object.
 /// Events that only apply to a single object type may use specific metadata like [`WorkflowTelemetryMetadata`],
 /// [`NotebookTelemetryMetadata`], or [`EnvVarTelemetryMetadata`] instead.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -401,7 +401,7 @@ pub enum PaletteSource {
     PrefixChange,
     Keybinding,
     CtrlTab { shift_pressed_initially: bool },
-    WarpDrive,
+    ZapDrive,
     QuitModal,
     LogOutModal,
     IntegrationTest,
@@ -463,7 +463,7 @@ pub enum PluginChipTelemetryKind {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationAgentVariant {
-    /// Warp's built-in agent (Oz).
+    /// Zap's built-in agent (Oz).
     Oz,
     /// A CLI agent (e.g., Claude Code, Gemini CLI, etc.).
     CLIAgent(CLIAgentType),
@@ -665,7 +665,7 @@ pub enum KnowledgePaneEntrypoint {
     Settings,
 
     #[serde(rename = "warp_drive")]
-    WarpDrive,
+    ZapDrive,
 
     #[serde(rename = "ai_blocklist")]
     AIBlocklist,
@@ -684,7 +684,7 @@ pub enum MCPServerCollectionPaneEntrypoint {
     Settings,
 
     #[serde(rename = "warp_drive")]
-    WarpDrive,
+    ZapDrive,
 
     #[serde(rename = "slash_command")]
     SlashCommand,
@@ -1249,7 +1249,7 @@ pub enum TelemetryEvent {
     DatabaseReadError(String),
     DatabaseWriteError(String),
     AppStartup(AppStartupInfo),
-    /// The native app was opened while logged out. Since Warp requires login,
+    /// The native app was opened while logged out. Since Zap requires login,
     /// this usually means a new user.
     LoggedOutStartup,
     /// We attempted to bootstrap an SSH session via the SSH wrapper.  The
@@ -1479,11 +1479,11 @@ pub enum TelemetryEvent {
     InitialWorkingDirectoryConfigurationChanged {
         advanced_mode_enabled: bool,
     },
-    /// Opened legacy Warp AI.
+    /// Opened legacy Zap AI.
     OpenedWarpAI {
         source: OpenedWarpAISource,
     },
-    /// Issued legacy Warp AI request.
+    /// Issued legacy Zap AI request.
     WarpAIRequestIssued {
         result: WarpAIRequestResult,
     },
@@ -1615,7 +1615,7 @@ pub enum TelemetryEvent {
         source: WarpDriveSource,
         is_code_mode_v2: bool,
     },
-    // Toggled the legacy Warp AI side panel.
+    // Toggled the legacy Zap AI side panel.
     ToggleWarpAI {
         opened: bool,
     },
@@ -1814,7 +1814,7 @@ pub enum TelemetryEvent {
     /// language auto-detection false-positive.
     AgentModePotentialAutoDetectionFalsePositive(AgentModeAutoDetectionFalsePositivePayload),
 
-    /// This is a telemetry event used to help track performance of Agent Predict in Warp,
+    /// This is a telemetry event used to help track performance of Agent Predict in Zap,
     /// by keeping track of the context given and the predictions generated.
     AgentModePrediction {
         was_suggestion_accepted: bool,
@@ -2366,7 +2366,7 @@ pub enum TelemetryEvent {
         block_id: BlockId,
         user_took_over: bool,
     },
-    /// Detected that Warp is running in an isolated sandbox.
+    /// Detected that Zap is running in an isolated sandbox.
     DetectedIsolationPlatform {
         platform: warp_isolation_platform::IsolationPlatformType,
     },

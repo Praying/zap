@@ -5113,7 +5113,7 @@ pub enum AIBlockEvent {
     },
     ToggleCodeDiffVisibility,
 
-    /// Open a Warp Text instance with the requested code diff.
+    /// Open a Zap Text instance with the requested code diff.
     OpenCodeWithDiff {
         view: ViewHandle<CodeDiffView>,
     },
@@ -5327,7 +5327,7 @@ pub enum AIBlockAction {
     DisableRuleSuggestions,
     /// Copy the debug ID to clipboard
     CopyDebugId(String),
-    /// Open Warp feedback documentation
+    /// Open Zap feedback documentation
     OpenFeedbackDocs,
     /// Toggle the usage summary footer expansion state
     ToggleIsUsageFooterExpanded,

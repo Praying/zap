@@ -302,7 +302,7 @@ pub enum CodeReviewPaneSnapshot {
 pub enum LeftPanelDisplayedTab {
     FileTree,
     GlobalSearch,
-    WarpDrive,
+    ZapDrive,
     ConversationListView,
     SshManager,
     SkillManager,
@@ -313,7 +313,7 @@ impl From<ToolPanelView> for LeftPanelDisplayedTab {
         match view {
             ToolPanelView::ProjectExplorer => LeftPanelDisplayedTab::FileTree,
             ToolPanelView::GlobalSearch { .. } => LeftPanelDisplayedTab::GlobalSearch,
-            ToolPanelView::WarpDrive => LeftPanelDisplayedTab::WarpDrive,
+            ToolPanelView::ZapDrive => LeftPanelDisplayedTab::ZapDrive,
             ToolPanelView::ConversationListView => LeftPanelDisplayedTab::ConversationListView,
             ToolPanelView::SshManager => LeftPanelDisplayedTab::SshManager,
             ToolPanelView::SkillManager => LeftPanelDisplayedTab::SkillManager,

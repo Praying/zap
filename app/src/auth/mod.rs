@@ -48,7 +48,7 @@ pub const API_KEY_PREFIX: &str = "wk-";
 // 本地化后只保留 `ApiKey` / `Test` 两种实际用得到的 variant。托管 token 与
 // cookie variant 已物理删除,所有原外部账号分支在 Zap 下永远走 `None` / 早 return。
 
-/// 表示用户与 Warp 的认证方式。
+/// 表示用户与 Zap 的认证方式。
 ///
 /// Zap 本地化分支:
 /// - `ApiKey`:BYOP 路径下用户自携 LLM provider API key,实际由 settings/keychain
@@ -56,7 +56,7 @@ pub const API_KEY_PREFIX: &str = "wk-";
 /// - `Test`:测试 / `skip_login` 构建下使用。
 #[derive(Clone, Debug)]
 pub enum Credentials {
-    /// BYOP / Warp Inc API key,保留 owner_type 供旧代码读取(永远 `None`)。
+    /// BYOP / Zap Inc API key,保留 owner_type 供旧代码读取(永远 `None`)。
     ApiKey {
         key: String,
         owner_type: Option<OwnerType>,
@@ -785,7 +785,7 @@ impl AuthManager {
     // ---------- URL 构造 facade ----------
     //
     // 旧 UI(login_slide / paste_auth_token_modal / auth_view_modal)在物理删除前
-    // 会调用这些方法以填充历史登录提示链接;Zap 不再打开 Warp 云登录页。
+    // 会调用这些方法以填充历史登录提示链接;Zap 不再打开 Zap 云登录页。
     // 物理删 UI 后已无调用方,但 enum/trait 仍可能被反射式消费,保留 stub。
 
     pub fn sign_up_url(&self) -> String {

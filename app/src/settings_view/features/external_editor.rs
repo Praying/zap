@@ -155,7 +155,7 @@ impl ExternalEditorView {
 
         let mut items = vec![default_app];
 
-        items.push(DropdownItem::new("Warp", make_action(EditorChoice::Warp)));
+        items.push(DropdownItem::new("Zap", make_action(EditorChoice::Zap)));
         if FeatureFlag::AllowOpeningFileLinksUsingEditorEnv.is_enabled() {
             items.push(DropdownItem::new(
                 "$EDITOR",
@@ -177,7 +177,7 @@ impl ExternalEditorView {
             EditorChoice::ExternalEditor(editor) => {
                 dropdown.set_selected_by_name(format!("{editor}"), ctx)
             }
-            EditorChoice::Warp => dropdown.set_selected_by_name("Warp", ctx),
+            EditorChoice::Zap => dropdown.set_selected_by_name("Zap", ctx),
             EditorChoice::EnvEditor => dropdown.set_selected_by_name("$EDITOR", ctx),
             EditorChoice::SystemDefault => dropdown.set_selected_by_name(default_option_text, ctx),
         };

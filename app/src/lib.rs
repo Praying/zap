@@ -1,6 +1,6 @@
 // Suppress warnings about rustdoc style.
 #![allow(clippy::doc_lazy_continuation)]
-// 上游 Warp 裁剪后遗留的孤儿代码暂时保留,统一抑制 dead_code 告警。
+// 上游 Zap 裁剪后遗留的孤儿代码暂时保留,统一抑制 dead_code 告警。
 #![allow(dead_code)]
 
 mod ai;
@@ -308,7 +308,7 @@ pub struct Assets;
 
 pub static ASSETS: Assets = Assets;
 
-/// Launch mode for how to start up Warp.
+/// Launch mode for how to start up Zap.
 #[allow(clippy::large_enum_variant)]
 pub enum LaunchMode {
     /// Run the regular GUI application.
@@ -319,7 +319,7 @@ pub enum LaunchMode {
         api_key: Option<String>,
     },
 
-    /// Run the Warp command-line SDK.
+    /// Run the Zap command-line SDK.
     CommandLine {
         command: warp_cli::CliCommand,
         global_options: GlobalOptions,
@@ -408,7 +408,7 @@ impl LaunchMode {
         }
     }
 
-    /// Returns `true` if Warp should run headlessly, without a visible UI.
+    /// Returns `true` if Zap should run headlessly, without a visible UI.
     fn is_headless(&self) -> bool {
         match self {
             LaunchMode::CommandLine { command, .. } => match command {
@@ -787,15 +787,15 @@ fn run_internal(mut launch_mode: LaunchMode) -> Result<()> {
             launch_mode.args().as_ref(),
         ) {
             // If we were able to contact an existing application instance, quit -
-            // we only want to run a single instance of Warp at a time.
+            // we only want to run a single instance of Zap at a time.
             Ok(_) => std::process::exit(0),
-            // If Warp isn't already running, we're good to go.
+            // If Zap isn't already running, we're good to go.
             Err(app_services::linux::StartupArgsForwardingError::NoExistingInstance) => {}
             // If we just finished an auto-update, we should continue running.
             Err(app_services::linux::StartupArgsForwardingError::IgnoredAfterAutoUpdate) => {}
             // If we were unable to perform the forwarding for an unknown reason,
             // it's better to run a second instance than potentially end up in a
-            // state where Warp refuses to run even a first instance.
+            // state where Zap refuses to run even a first instance.
             Err(err) => {
                 let err = anyhow::Error::from(err).context("Failed to forward startup args");
                 log::error!("{err:#}");
@@ -810,15 +810,15 @@ fn run_internal(mut launch_mode: LaunchMode) -> Result<()> {
             launch_mode.args().as_ref(),
         ) {
             // If we were able to contact an existing application instance, quit -
-            // we only want to run a single instance of Warp at a time.
+            // we only want to run a single instance of Zap at a time.
             Ok(_) => std::process::exit(0),
-            // If Warp isn't already running, we're good to go.
+            // If Zap isn't already running, we're good to go.
             Err(app_services::windows::StartupArgsForwardingError::NoExistingInstance) => {}
             // If we just finished an auto-update, we should continue running.
             Err(app_services::windows::StartupArgsForwardingError::IgnoredAfterAutoUpdate) => {}
             // If we were unable to perform the forwarding for an unknown reason,
             // it's better to run a second instance than potentially end up in a
-            // state where Warp refuses to run even a first instance.
+            // state where Zap refuses to run even a first instance.
             Err(err) => {
                 let err = anyhow::Error::from(err).context("Failed to forward startup args");
                 log::error!("{err:#}");
@@ -827,7 +827,7 @@ fn run_internal(mut launch_mode: LaunchMode) -> Result<()> {
         }
     }
 
-    // Sets up a Job Object that we associate with the Warp process to handle
+    // Sets up a Job Object that we associate with the Zap process to handle
     // shared fate with its child processes. This should be called before we
     // start spawning any child processes.
     #[cfg(windows)]
@@ -1293,7 +1293,7 @@ fn initialize_app(
         apply_scroll_multiplier(event, ctx);
     });
 
-    // Rewrite recognized Warp web URLs (sessions, Drive, settings, home) into local
+    // Rewrite recognized Zap web URLs (sessions, Drive, settings, home) into local
     // intent URLs when possible so they open directly in the desktop app.
     ctx.set_before_open_url(|url_str, _ctx| {
         if let Ok(url) = Url::parse(url_str) {
@@ -1809,7 +1809,7 @@ fn app_callbacks(is_integration_test: bool) -> warpui::platform::AppCallbacks {
             });
 
             // We want to tear down the terminal server before relaunching for
-            // autoupdate, to ensure we're not running any extra Warp processes
+            // autoupdate, to ensure we're not running any extra Zap processes
             // when we bring up the new process.  Additionally, this must occur
             // after terminating the persistence writer, so we don't keep track
             // of the fact that the shell sessions terminated.
@@ -2267,7 +2267,7 @@ pub fn enabled_features() -> HashSet<FeatureFlag> {
     #[cfg(all(debug_assertions, not(windows)))]
     flags.insert(FeatureFlag::SshRemoteServer);
 
-    // Issue #72: HTTP 代理设置页面。不走 channel 判断,所有 channel 含 warp-oss
+    // Issue #72: HTTP 代理设置页面。不走 channel 判断,所有 channel 含 zap-oss
     // 默认启用,作为企业 VPN / 公司代理场景的基本能力。
     flags.insert(FeatureFlag::HttpProxySettings);
 
