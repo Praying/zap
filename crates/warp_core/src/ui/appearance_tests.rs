@@ -25,6 +25,7 @@ fn mock_appearance() -> Appearance {
         FamilyId(1),
         1.4,
         FamilyId(0),
+        None,
         FamilyId(0),
         DEFAULT_UI_FONT_SIZE,
         Default::default(),
@@ -206,4 +207,20 @@ fn test_dropdown_top_bar_height_at_boundaries() {
 
     appearance.set_ui_font_size_test(20.0);
     assert_eq!(appearance.dropdown_top_bar_height(), 50.0);
+}
+
+#[test]
+fn test_terminal_fallback_font_family_can_be_updated() {
+    let mut appearance = mock_appearance();
+
+    assert_eq!(appearance.terminal_fallback_font_family(), None);
+
+    appearance.set_terminal_fallback_font_family_test(Some(FamilyId(42)));
+    assert_eq!(
+        appearance.terminal_fallback_font_family(),
+        Some(FamilyId(42))
+    );
+
+    appearance.set_terminal_fallback_font_family_test(None);
+    assert_eq!(appearance.terminal_fallback_font_family(), None);
 }
