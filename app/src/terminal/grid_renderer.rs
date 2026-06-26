@@ -2722,6 +2722,7 @@ impl<'a> AttributedStringBuilder<'a> {
     }
 
     fn fallback_font_family_for_char(&self, chr: char) -> Option<FamilyId> {
+        let fallback_font_family = self.fallback_font_family?;
         let primary_font = self.font_cache.select_font(
             self.current_style.font_family,
             self.current_style.properties,
@@ -2734,7 +2735,6 @@ impl<'a> AttributedStringBuilder<'a> {
             return None;
         }
 
-        let fallback_font_family = self.fallback_font_family?;
         let fallback_font = self
             .font_cache
             .select_font(fallback_font_family, self.current_style.properties);

@@ -139,6 +139,17 @@ fn default_font_label(is_ai_font: bool) -> String {
     }
 }
 
+fn fallback_font_dropdown_should_include_font(
+    name: &str,
+    font_type: FontType,
+    view_font_type: FontType,
+    selected_font_name: &str,
+) -> bool {
+    matches!(view_font_type, FontType::Any)
+        || matches!(font_type, FontType::Monospace)
+        || name == selected_font_name
+}
+
 pub fn init_actions_from_parent_view<T: Action + Clone>(
     app: &mut AppContext,
     context: &ContextPredicate,
@@ -2338,10 +2349,12 @@ impl AppearanceSettingsPageView {
                     .available_families
                     .iter()
                     .filter_map(|(name, (family, font_type))| {
-                        let include_in_dropdown = name != &MonospaceFontName::default_value()
-                            && (matches!(self.view_font_type, FontType::Any)
-                                || matches!(font_type, FontType::Monospace)
-                                || *name == font_name);
+                        let include_in_dropdown = fallback_font_dropdown_should_include_font(
+                            name,
+                            *font_type,
+                            self.view_font_type,
+                            &font_name,
+                        );
                         if include_in_dropdown {
                             let name_move = name.clone();
                             let mut dropdown = DropdownItem::new(
@@ -6099,3 +6112,7 @@ impl From<ViewHandle<AppearanceSettingsPageView>> for SettingsPageViewHandle {
         SettingsPageViewHandle::Appearance(view_handle)
     }
 }
+
+#[cfg(test)]
+#[path = "appearance_page_tests.rs"]
+mod tests;
